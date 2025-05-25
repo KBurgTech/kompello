@@ -10,7 +10,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useAuth } from "~/components/authContext"
 import { useNavigate } from "react-router"
-import { useEffect, type JSX } from "react"
+import { useEffect, useState, type JSX } from "react"
+import { AlertCircle, Loader2 } from "lucide-react"
+import { Alert, AlertTitle, AlertDescription } from "~/components/ui/alert"
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -37,6 +39,8 @@ const loginFormSchema = z.object({
 export default function Login(): JSX.Element {
     const auth = useAuth()
     const navigate = useNavigate();
+    const [loginFailed, setLoginFailed] = useState(false)
+    const [loginInProgress, setLoginInProgress] = useState(false)
 
     const form = useForm<z.infer<typeof loginFormSchema>>({
         resolver: zodResolver(loginFormSchema),
@@ -53,7 +57,13 @@ export default function Login(): JSX.Element {
      * @returns A promise that resolves when the login process is complete.
      */
     async function onLogin(values: z.infer<typeof loginFormSchema>) {
+        setLoginFailed(false)
+        setLoginInProgress(true)
+
         const success = await auth.login(values.username, values.password)
+        setLoginFailed(!success)
+        setLoginInProgress(false)
+
         if (success) {
             navigate("/")
         }
@@ -69,7 +79,17 @@ export default function Login(): JSX.Element {
     return (<div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-sm">
             <div className={cn("flex flex-col gap-6")}>
+                {loginFailed && !auth.user && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Login Failure</AlertTitle>
+                        <AlertDescription>
+                            Authenticating you in with the provided credentials failed. Please check your username and password.
+                        </AlertDescription>
+                    </Alert>
+                )}
                 <Card>
+
                     <CardHeader>
                         <CardTitle className="text-2xl">Login</CardTitle>
                         <CardDescription>
@@ -113,7 +133,10 @@ export default function Login(): JSX.Element {
                                                 </FormItem>
                                             )}
                                         />
-                                        <Button className="w-full" type="submit">Login</Button>
+                                        <Button disabled={loginInProgress} className="w-full" type="submit">
+                                            {loginInProgress && (<Loader2 className="animate-spin" />)}
+                                            Login
+                                        </Button>
                                     </form>
                                 </Form>
                             </div>

@@ -115,21 +115,21 @@ export function AuthProvider({ children }) {
      * @returns {Promise<boolean>} A promise that resolves to `true` if login is successful, otherwise `false`.
      */
     async function login(username: string, password: string): Promise<boolean> {
-        const response = await AllauthApi.authenticationAccountApi.allauthClientV1AuthLoginPost({
-            client: "browser",
-            login: {
-                username: username,
-                password: password,
-                email: "",
-                phone: ""
-            },
-        });
-
-        if (response.status === 200) {
+        try {
+            await AllauthApi.authenticationAccountApi.allauthClientV1AuthLoginPost({
+                client: "browser",
+                login: {
+                    username: username,
+                    password: password,
+                    email: "",
+                    phone: ""
+                },
+            });
             document.dispatchEvent(new CustomEvent(LOGIN_CHANGE_EVENT));
             return true;
+        } catch (error) {
+            return false;
         }
-        return false;
     }
 
     /**
