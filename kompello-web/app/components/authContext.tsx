@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, type JSX } from "react";
 import type { AuthenticatedResponse } from "~/lib/api/allauth";
 import { AllauthApi, LOGIN_CHANGE_EVENT } from "~/lib/api/allauthApi";
 import { Skeleton } from "./ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 /**
  * Represents the authentication context for the application.
@@ -28,12 +29,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  *
  * @returns {JSX.Element} A React element displaying loading skeletons.
  */
-function Loading() {
-    return <div className="flex flex-col space-y-3">
-        <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-        <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px]" />
-            <Skeleton className="h-4 w-[200px]" />
+function Loading(): JSX.Element {
+    return <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-sm space-y-3">
+            <Loader2 className="animate-spin" />
+            <Skeleton className="h-[125px] w-[70%] rounded-xl" />
+            <Skeleton className="h-4 w-[auto] rounded-xl" />
+            <Skeleton className="h-4 w-[80%] rounded-xl" />
+            <Skeleton className="h-4 w-[90%] rounded-xl" />
         </div>
     </div>
 }
