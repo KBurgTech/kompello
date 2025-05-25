@@ -23,6 +23,7 @@ import {
 } from "~/components/ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
 import { SideBarUser } from "./appSideBarUser"
+import ThemeSwitcher from "./themeSwitcher"
 
 interface MenuItem {
     type: "group" | "single" | "multi",
@@ -197,6 +198,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 })}
             </SidebarContent>
             <SidebarFooter>
+                <ThemeSwitcher />
                 <SideBarUser />
             </SidebarFooter>
         </Sidebar>
