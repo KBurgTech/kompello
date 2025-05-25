@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Backend Stuff
+kompello/db.sqlite3
+
+# Frontend Stuff
+kompello-web/node_modules/
+kompello-web/build/
+kompello-web/.react-router/

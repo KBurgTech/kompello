@@ -1,0 +1,14 @@
+{% extends "base_view.html" %}
+{% load static %}
+
+{% block content %}
+<div id="react-view">
+    <h1>Loading...</h1>
+</div>
+<script>
+    const context = "{{ context }}";
+    window.onload = function () {
+        import("{% static context.react_view %}")
+    };
+</script>
+{% endblock %}
