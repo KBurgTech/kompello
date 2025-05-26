@@ -24,5 +24,5 @@ urlpatterns = [
         path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema.spec'), name='schema.swagger'),
     ])),
     path('', include("kompello.core.urls", namespace="core")),
-    path("_allauth/", include("allauth.headless.urls")),
+    path("_allauth/", include("allauth.headless.urls", namespace="allauth")),
 ]

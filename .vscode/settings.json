@@ -1,0 +1,20 @@
+{
+    "python.testing.unittestArgs": [
+        "-p",
+        "*_test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.analysis.autoImportCompletions": false,
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "",
+            "depth": 12,
+            "includeAllSymbols": true
+        }
+    ],
+    "python.analysis.extraPaths": [
+        "./.venv"
+    ]
+}

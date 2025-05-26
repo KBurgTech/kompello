@@ -21,16 +21,22 @@
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "npm",
-            "runtimeArgs": ["run", "dev"],
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "cwd": "${workspaceFolder}/kompello-web"
-          },
+        }
     ],
     "compounds": [
         {
             "name": "Backend & Frontend",
-            "configurations": ["Django", "Run Vite Dev Server"]
+            "configurations": [
+                "Django",
+                "Run Vite Dev Server"
+            ]
         }
     ]
 }
