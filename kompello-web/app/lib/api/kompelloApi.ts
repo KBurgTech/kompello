@@ -1,16 +1,21 @@
 import { AuthenticationAccountApi } from "./allauth/apis/AuthenticationAccountApi";
 import { Configuration, type Middleware, type RequestContext, type ResponseContext } from "./allauth/runtime";
 import { AuthenticationCurrentSessionApi } from "./allauth/apis";
+import { SystemApi } from "./kompello";
+import { Configuration as KompelloConfiguration } from "./kompello/runtime";
 
 // Wrapper for the allauth API to handle session tokens and login state automatically for all API calls
-
-
-const LOGIN_CHANGE_EVENT = "KOMPELLO_LOGIN_CHANGE_EVENT";
 
 // Middleware to handle session cookie for all API calls
 // This middleware ensures that the session cookie is included in the request headers
 const sessionTokenMiddleware: Middleware = {
     pre: async (context: RequestContext) => {
+        const additionalHeaders = {}
+
+        // If the request is not GET or HEAD request, add the CSRF token to the headers
+        if(context.init.method !== "GET" && context.init.method !== "HEAD") {
+            additionalHeaders["X-CSRFTOKEN"] = await getCsrfToken();
+        }
         return {
             ...context,
             init: {
@@ -18,10 +23,15 @@ const sessionTokenMiddleware: Middleware = {
                 credentials: "include", // Ensure credentials are included
                 headers: {
                     ...context.init.headers,
+                    ...additionalHeaders
                 }
             }
         }
     }
+}
+
+async function getCsrfToken(): Promise<string | undefined> {
+    return (await kompelloApi.systemApi.systemGetCsrfToken()).csrfToken;
 }
 
 const configBase = {
@@ -31,22 +41,23 @@ const configBase = {
     ]
 }
 
-// Config for all standard APIs
-const config = new Configuration(configBase);
+const allauthConfig = new Configuration(configBase);
+const kompelloConfig = new KompelloConfiguration(configBase);
 
-
-class AllauthApiImpl {
+class KompelloApiImpl {
     authenticationAccountApi: AuthenticationAccountApi;
     currentSessionApi: AuthenticationCurrentSessionApi;
+    systemApi: SystemApi;
 
     constructor() {
-        this.authenticationAccountApi = new AuthenticationAccountApi(config);
-        this.currentSessionApi = new AuthenticationCurrentSessionApi(config);
+        this.authenticationAccountApi = new AuthenticationAccountApi(allauthConfig);
+        this.currentSessionApi = new AuthenticationCurrentSessionApi(allauthConfig);
+        this.systemApi = new SystemApi(kompelloConfig);
     }
 }
-const allauthApi = new AllauthApiImpl();
+
+const kompelloApi = new KompelloApiImpl();
 
 export {
-    allauthApi as AllauthApi,
-    LOGIN_CHANGE_EVENT
+    kompelloApi as KompelloApi,
 };

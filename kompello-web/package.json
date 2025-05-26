@@ -7,7 +7,8 @@
     "dev": "react-router dev --host",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "api_allauth": "npx @openapitools/openapi-generator-cli generate -i openapi_allauth.yaml -g typescript-fetch -o ./app/lib/api/allauth/ --skip-validate-spec"
+    "api_allauth": "npx @openapitools/openapi-generator-cli generate -i ./openapi/allauth.yaml -g typescript-fetch -o ./app/lib/api/allauth/ --skip-validate-spec",
+    "api_kompello": "npx @openapitools/openapi-generator-cli generate -i ./openapi/kompello.yaml -g typescript-fetch -o ./app/lib/api/kompello/ --skip-validate-spec"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

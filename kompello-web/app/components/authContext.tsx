@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, useEffect, type JSX } from "react";
 import type { AuthenticatedResponse } from "~/lib/api/allauth";
-import { AllauthApi, LOGIN_CHANGE_EVENT } from "~/lib/api/allauthApi";
+import { KompelloApi } from "~/lib/api/kompelloApi";
 import { Skeleton } from "./ui/skeleton";
 import { Loader2 } from "lucide-react";
+
+const LOGIN_CHANGE_EVENT = "KOMPELLO_LOGIN_CHANGE_EVENT";
 
 /**
  * Represents the authentication context for the application.
@@ -82,7 +84,7 @@ export function AuthProvider({ children }) {
         let response: AuthenticatedResponse;
 
         try {
-            response = await AllauthApi.currentSessionApi.allauthClientV1AuthSessionGet({ client: "browser" });
+            response = await KompelloApi.currentSessionApi.allauthClientV1AuthSessionGet({ client: "browser" });
         } catch (error) {
             setUser(null);
             setSessionLoading(false);
@@ -119,7 +121,7 @@ export function AuthProvider({ children }) {
      */
     async function login(username: string, password: string): Promise<boolean> {
         try {
-            await AllauthApi.authenticationAccountApi.allauthClientV1AuthLoginPost({
+            await KompelloApi.authenticationAccountApi.allauthClientV1AuthLoginPost({
                 client: "browser",
                 login: {
                     username: username,
@@ -142,7 +144,7 @@ export function AuthProvider({ children }) {
      * @returns {void}
      */
     function logout(): void {
-        AllauthApi.currentSessionApi.allauthClientV1AuthSessionDelete({ client: "browser" })
+        KompelloApi.currentSessionApi.allauthClientV1AuthSessionDelete({ client: "browser" })
             .catch(() => {
                 document.dispatchEvent(new CustomEvent(LOGIN_CHANGE_EVENT));
             });
