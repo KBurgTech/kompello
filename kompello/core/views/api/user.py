@@ -1,6 +1,6 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -13,7 +13,7 @@ from kompello.core.serializers.user_serializers import (
 from kompello.core.views.api.base import BaseModelViewSet
 
 
-class KompelloUserPermissions(permissions.BasePermission):
+class OwnUserObjectPermission(permissions.BasePermission):
     """
     Allows a user to only access their own user object
     """
@@ -26,32 +26,37 @@ class UserViewSet(BaseModelViewSet):
     queryset = KompelloUser.objects.all()
     serializer_class = UserSerializer
 
-    def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
-        if self.action == "destroy":
-            permission_classes = [NoOne]
-        elif self.action == "list":
-            permission_classes = [permissions.IsAdminUser]
-        elif self.action in (
-            "retrieve",
-            "update",
-            "partial_update",
-            "set_password",
-        ):
-            permission_classes = [KompelloUserPermissions | permissions.IsAdminUser]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
+    @permission_classes([permissions.IsAdminUser])
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
-        return [permission() for permission in permission_classes]
+    @permission_classes([OwnUserObjectPermission | permissions.IsAdminUser])
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @permission_classes([OwnUserObjectPermission | permissions.IsAdminUser])
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @permission_classes([OwnUserObjectPermission | permissions.IsAdminUser])
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @permission_classes([OwnUserObjectPermission | permissions.IsAdminUser])
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @permission_classes([NoOne])
+    def destroy(self, request, *args, **kwargs):
+        print(self.permission_classes)
+        return super().destroy(request, *args, **kwargs)
 
     @extend_schema(
         responses={200: UserSerializer},
         description="Gets the currently logged in user",
         operation_id="users_me",
     )
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
     def me(self, request: Request):
         user = request.user
         return Response(UserSerializer(user).data)
@@ -63,6 +68,7 @@ class UserViewSet(BaseModelViewSet):
         operation_id="users_set_password",
     )
     @action(detail=True, methods=["post"])
+    @permission_classes([OwnUserObjectPermission | permissions.IsAdminUser])
     def set_password(self, request: Request, uuid=None):
         user: KompelloUser = self.get_object()
         serializer = PasswordSerializer(data=request.data)

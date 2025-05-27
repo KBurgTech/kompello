@@ -1,3 +1,4 @@
+from http import HTTPMethod
 from django.urls import reverse
 from rest_framework import status
 
@@ -8,8 +9,8 @@ from kompello.core.tests.helper import BaseTestCase, USER_PASSWORD
 
 class UserViewsetTest(BaseTestCase):
     def setUp(self):
-        self.admin_users = self._create_admin_user(1)
-        self.users = self._create_user(5)
+        self.admin_users = self.create_admin_user(1)
+        self.users = self.create_user(5)
 
     def test_create(self):
         """
@@ -22,6 +23,7 @@ class UserViewsetTest(BaseTestCase):
         Additionally, it checks that the user object is created in the database and that the password is not equal to the input password.
 
         """
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         data = {
             "first_name": "Firstname",
             "last_name": "Lastname",
@@ -57,7 +59,7 @@ class UserViewsetTest(BaseTestCase):
         self.assertEqual(list_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Test Admin can list
-        self._login(email=self.admin_users[0].email, password=USER_PASSWORD)
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         list_auth_resp = self.client.get(reverse("core:users-list"), format="json")
         self.assertEqual(list_auth_resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(list_auth_resp.data), 6)
@@ -91,7 +93,7 @@ class UserViewsetTest(BaseTestCase):
             reverse("core:users-detail", args=[f"{user.uuid}"])
         )
         self.assertEqual(get_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
-        self._login(email=user.email, password=USER_PASSWORD)
+        self.login(email=user.email, password=USER_PASSWORD)
         get_auth_resp = self.client.get(
             reverse("core:users-detail", args=[f"{user.uuid}"])
         )
@@ -101,8 +103,8 @@ class UserViewsetTest(BaseTestCase):
         )
         self.assertEqual(get_auth_resp_not_user.status_code, status.HTTP_403_FORBIDDEN)
 
-        self._logout()
-        self._login(email=adminuser.email, password=USER_PASSWORD)
+        self.logout()
+        self.login(email=adminuser.email, password=USER_PASSWORD)
         get_auth_resp_not_self = self.client.get(
             reverse("core:users-detail", args=[f"{user.uuid}"])
         )
@@ -143,7 +145,7 @@ class UserViewsetTest(BaseTestCase):
         )
         self.assertEqual(get_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        self._login(email=user.email, password=USER_PASSWORD)
+        self.login(email=user.email, password=USER_PASSWORD)
         get_auth_resp = self.client.put(
             reverse("core:users-detail", args=[f"{user.uuid}"]), data, format="json"
         )
@@ -165,7 +167,7 @@ class UserViewsetTest(BaseTestCase):
         2. Retrieve a non-superuser user from the database.
         3. Send a PATCH request to the user detail endpoint with the updated data, without authentication.
         4. Verify that the response status code is 401 UNAUTHORIZED.
-        5. Log in as the user using the `_login` method.
+        5. Log in as the user using the `login` method.
         6. Send a PATCH request to the user detail endpoint with the updated data, with authentication.
         7. Verify that the response status code is 200 OK.
         8. Retrieve the updated user from the database.
@@ -183,7 +185,7 @@ class UserViewsetTest(BaseTestCase):
         )
         self.assertEqual(get_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        self._login(email=user.email, password=USER_PASSWORD)
+        self.login(email=user.email, password=USER_PASSWORD)
         get_auth_resp = self.client.patch(
             reverse("core:users-detail", args=[f"{user.uuid}"]), data, format="json"
         )
@@ -208,11 +210,11 @@ class UserViewsetTest(BaseTestCase):
         )
         self.assertEqual(get_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        self._login(email=user.email, password=USER_PASSWORD)
+        self.login(email=user.email, password=USER_PASSWORD)
         get_auth_resp = self.client.delete(
             reverse("core:users-detail", args=[f"{user.uuid}"]), format="json"
         )
-        self.assertEqual(get_auth_resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(get_auth_resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_set_password(self):
         """
@@ -233,18 +235,18 @@ class UserViewsetTest(BaseTestCase):
         data = {"password": "NewPassword"}
         user = KompelloUser.objects.filter(is_superuser=False).first()
 
-        no_auth, auth = self._test_auth_not_auth(
+        no_auth, auth = self.request_auth_not_auth(
+            HTTPMethod.POST,
             user,
             {
                 "path": reverse("core:users-set-password", args=[f"{user.uuid}"]),
                 "data": data,
                 "format": "json",
             },
-            "post",
         )
         self.assertEqual(no_auth.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(auth.status_code, status.HTTP_200_OK)
-        self.assertTrue(self._login(email=user.email, password="NewPassword"))
+        self.assertTrue(self.login(email=user.email, password="NewPassword"))
 
     def test_me(self):
         """
@@ -257,7 +259,7 @@ class UserViewsetTest(BaseTestCase):
         me_not_auth_resp = self.client.get(reverse("core:users-me"), format="json")
         self.assertEqual(me_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        self._login(email=self.admin_users[0].email, password=USER_PASSWORD)
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         me_auth_resp = self.client.get(reverse("core:users-me"), format="json")
         self.assertEqual(me_auth_resp.status_code, status.HTTP_200_OK)
         self.assertEqual(UserSerializer(self.admin_users[0]).data, me_auth_resp.data)
@@ -273,8 +275,8 @@ class UserApiPermissionsTest(BaseTestCase):
     """
 
     def setUp(self):
-        self.admin_users = self._create_admin_user(1)
-        self.users = self._create_user(5)
+        self.admin_users = self.create_admin_user(1)
+        self.users = self.create_user(5)
 
     def test_list_only_admin(self):
         """
@@ -283,12 +285,12 @@ class UserApiPermissionsTest(BaseTestCase):
         This test verifies that only admin users can access the user list endpoint.
         It checks that non-admin users receive a 403 Forbidden status code when trying to access the endpoint.
         """
-        self._login(email=self.users[0].email, password=USER_PASSWORD)
+        self.login(email=self.users[0].email, password=USER_PASSWORD)
         list_not_auth_resp = self.client.get(reverse("core:users-list"), format="json")
         self.assertEqual(list_not_auth_resp.status_code, status.HTTP_403_FORBIDDEN)
 
-        self._logout()
-        self._login(email=self.admin_users[0].email, password=USER_PASSWORD)
+        self.logout()
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         list_auth_resp = self.client.get(reverse("core:users-list"), format="json")
         self.assertEqual(list_auth_resp.status_code, status.HTTP_200_OK)
 
@@ -313,23 +315,23 @@ class UserApiPermissionsTest(BaseTestCase):
         self.assertEqual(modify_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Test normal user cannot modify another user
-        self._login(email=self.users[0].email, password=USER_PASSWORD)
+        self.login(email=self.users[0].email, password=USER_PASSWORD)
         modify_auth_resp = self.client.put(
             reverse("core:users-detail", args=[f"{user.uuid}"]), data, format="json"
         )
         self.assertEqual(modify_auth_resp.status_code, status.HTTP_403_FORBIDDEN)
-        self._logout()
+        self.logout()
 
         # Test admin user can modify another user
-        self._login(email=self.admin_users[0].email, password=USER_PASSWORD)
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         modify_auth_resp = self.client.put(
             reverse("core:users-detail", args=[f"{user.uuid}"]), data, format="json"
         )
         self.assertEqual(modify_auth_resp.status_code, status.HTTP_200_OK)
-        self._logout()
+        self.logout()
 
         # Test user can modify their own information
-        self._login(email=user.email, password=USER_PASSWORD)
+        self.login(email=user.email, password=USER_PASSWORD)
         modify_auth_resp = self.client.put(
             reverse("core:users-detail", args=[f"{user.uuid}"]), data, format="json"
         )
@@ -345,7 +347,7 @@ class UserApiPermissionsTest(BaseTestCase):
         me_not_auth_resp = self.client.get(reverse("core:users-me"), format="json")
         self.assertEqual(me_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        self._login(email=self.admin_users[0].email, password=USER_PASSWORD)
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         me_auth_resp = self.client.get(reverse("core:users-me"), format="json")
         self.assertEqual(me_auth_resp.status_code, status.HTTP_200_OK)
 
@@ -365,17 +367,17 @@ class UserApiPermissionsTest(BaseTestCase):
         self.assertEqual(delete_not_auth_resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Test normal user cannot delete
-        self._login(email=self.users[0].email, password=USER_PASSWORD)
+        self.login(email=self.users[0].email, password=USER_PASSWORD)
         delete_auth_resp = self.client.delete(
             reverse("core:users-detail", args=[f"{user.uuid}"]), format="json"
         )
         self.assertEqual(delete_auth_resp.status_code, status.HTTP_403_FORBIDDEN)
-        self._logout()
+        self.logout()
 
         # Test admin user cannot delete
-        self._login(email=self.admin_users[0].email, password=USER_PASSWORD)
+        self.login(email=self.admin_users[0].email, password=USER_PASSWORD)
         delete_auth_resp = self.client.delete(
             reverse("core:users-detail", args=[f"{user.uuid}"]), format="json"
         )
         self.assertEqual(delete_auth_resp.status_code, status.HTTP_403_FORBIDDEN)
-        self._logout()
+        self.logout()
