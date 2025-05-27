@@ -5,6 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from kompello.core.models.auth_models import KompelloUser
+from kompello.core.permissions import NoOne
 from kompello.core.serializers.user_serializers import (
     PasswordSerializer,
     UserSerializer,
@@ -29,18 +30,19 @@ class UserViewSet(BaseModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action == "list":
+        if self.action == "destroy":
+            permission_classes = [NoOne]
+        elif self.action == "list":
             permission_classes = [permissions.IsAdminUser]
         elif self.action in (
             "retrieve",
             "update",
             "partial_update",
-            "destroy",
             "set_password",
         ):
             permission_classes = [KompelloUserPermissions | permissions.IsAdminUser]
         else:
-            permission_classes = [permissions.AllowAny]
+            permission_classes = [permissions.IsAuthenticated]
 
         return [permission() for permission in permission_classes]
 
