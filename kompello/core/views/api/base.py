@@ -16,5 +16,5 @@ class BaseModelViewSet(viewsets.ModelViewSet):
         """
         action = getattr(self, self.action, None)
         if action and hasattr(action, "permission_classes"):
-            return [permission() for permission in action.permission_classes]
+            return super().get_permissions() + [permission() for permission in action.permission_classes]
         return super().get_permissions()

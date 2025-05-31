@@ -48,7 +48,6 @@ class UserViewSet(BaseModelViewSet):
 
     @permission_classes([NoOne])
     def destroy(self, request, *args, **kwargs):
-        print(self.permission_classes)
         return super().destroy(request, *args, **kwargs)
 
     @extend_schema(

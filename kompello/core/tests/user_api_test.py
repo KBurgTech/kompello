@@ -6,7 +6,6 @@ from kompello.core.models.auth_models import KompelloUser
 from kompello.core.serializers.user_serializers import UserSerializer
 from kompello.core.tests.helper import BaseTestCase, USER_PASSWORD
 
-
 class UserViewsetTest(BaseTestCase):
     def setUp(self):
         self.admin_users = self.create_admin_user(1)
@@ -267,11 +266,6 @@ class UserViewsetTest(BaseTestCase):
 
 class UserApiPermissionsTest(BaseTestCase):
     """Test suite for verifying user API permissions.
-    This class contains tests to ensure that user-related API endpoints enforce proper permissions:
-    - Only admin users can list all users.
-    - Only authenticated users can access their own user information.
-    - Only authenticated users or admin can update a users / their own user information.
-    - No user (including admin) can delete any user.
     """
 
     def setUp(self):
