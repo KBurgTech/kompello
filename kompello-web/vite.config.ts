@@ -10,5 +10,8 @@ export default defineConfig({
       usePolling: true,
       interval: 1000, // Adjust the polling interval as needed
     }
-  }
+  },
+  build: {
+    assetsDir: "static",
+   }
 });
