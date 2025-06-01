@@ -10,9 +10,10 @@ import { Save } from "lucide-react"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { Textarea } from "~/components/ui/textarea"
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from "~/components/ui/card"
+import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent } from "~/components/ui/card"
 import ActionButton from "~/components/actionButton"
 import { KompelloApi } from "~/lib/api/kompelloApi"
+import { useTranslation } from "react-i18next"
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -30,9 +31,10 @@ export default function Settings() {
     const { setTitle } = useTitle()
     const context = useOutletContext<Company>()
     const navigate = useNavigate()
-
+    const { t } = useTranslation();
+    
     useEffect(() => {
-        setTitle(`Settings - ${context.name || "Company"}`)
+        setTitle(`${t("views.companySettings.settings")} - ${context.name || "Company"}`)
     }, [])
 
     const form = useForm<z.infer<typeof companySchema>>({
@@ -59,9 +61,9 @@ export default function Settings() {
             <div className="grid grid-cols-1 gap-2 md:col-span-3">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Basic Settings</CardTitle>
-                        <CardDescription>Change the company name and description</CardDescription>
-                        <CardAction><ActionButton icon={Save} action={() => form.handleSubmit(onSave)()}>Save</ActionButton></CardAction>
+                        <CardTitle>{t("views.companySettings.basic.title")}</CardTitle>
+                        <CardDescription>{t("views.companySettings.basic.description")}</CardDescription>
+                        <CardAction><ActionButton icon={Save} action={() => form.handleSubmit(onSave)()}>{t("actions.save")}</ActionButton></CardAction>
                     </CardHeader>
                     <CardContent>
                         <Form {...form}>
@@ -71,12 +73,12 @@ export default function Settings() {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("views.companySettings.basic.companyName")}</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="shadcn" {...field} />
                                             </FormControl>
                                             <FormDescription>
-                                                This is your public display name.
+                                                {t("views.companySettings.basic.companyNameDescription")}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -87,7 +89,7 @@ export default function Settings() {
                                     name="description"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Description</FormLabel>
+                                            <FormLabel>{t("views.companySettings.basic.companyDescription")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     placeholder="Tell us a little bit about yourself"
@@ -96,7 +98,7 @@ export default function Settings() {
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                This is your company description.
+                                                {t("views.companySettings.basic.companyDescriptionDescription")}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>

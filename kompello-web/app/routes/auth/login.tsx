@@ -13,6 +13,7 @@ import { useNavigate } from "react-router"
 import { useEffect, useState, type JSX } from "react"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { Alert, AlertTitle, AlertDescription } from "~/components/ui/alert"
+import { useTranslation } from 'react-i18next';
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -41,6 +42,7 @@ export default function Login(): JSX.Element {
     const navigate = useNavigate();
     const [loginFailed, setLoginFailed] = useState(false)
     const [loginInProgress, setLoginInProgress] = useState(false)
+    const { t } = useTranslation();
 
     const form = useForm<z.infer<typeof loginFormSchema>>({
         resolver: zodResolver(loginFormSchema),
@@ -85,18 +87,18 @@ export default function Login(): JSX.Element {
                 {loginFailed && !auth.user && (
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Login Failure</AlertTitle>
+                        <AlertTitle>{t("views.login.loginFailureTitle")}</AlertTitle>
                         <AlertDescription>
-                            Authenticating you in with the provided credentials failed. Please check your username and password.
+                            {t("views.login.loginFailureDescription")}
                         </AlertDescription>
                     </Alert>
                 )}
                 <Card>
 
                     <CardHeader>
-                        <CardTitle className="text-2xl">Login</CardTitle>
+                        <CardTitle className="text-2xl"> {t("views.login.title")}</CardTitle>
                         <CardDescription>
-                            Enter your email below to login to your account!
+                            {t("views.login.description")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -109,12 +111,12 @@ export default function Login(): JSX.Element {
                                             name="username"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Username</FormLabel>
+                                                    <FormLabel>{t("views.login.username")}</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="shadcn" {...field} />
+                                                        <Input placeholder="email@example.com" {...field} />
                                                     </FormControl>
                                                     <FormDescription>
-                                                        This is your public display name.
+                                                        {t("views.login.usernameDescription")}
                                                     </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
@@ -125,12 +127,12 @@ export default function Login(): JSX.Element {
                                             name="password"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Password</FormLabel>
+                                                    <FormLabel>{t("views.login.password")}</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="••••••••" type="password" {...field} />
                                                     </FormControl>
                                                     <FormDescription>
-                                                        This is your account password.
+                                                        {t("views.login.passwordDescription")}
                                                     </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
@@ -138,7 +140,7 @@ export default function Login(): JSX.Element {
                                         />
                                         <Button disabled={loginInProgress} className="w-full" type="submit">
                                             {loginInProgress && (<Loader2 className="animate-spin" />)}
-                                            Login
+                                            {t("actions.login")}
                                         </Button>
                                     </form>
                                 </Form>

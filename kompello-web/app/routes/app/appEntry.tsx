@@ -5,8 +5,9 @@ import { useTitle } from "~/components/titleContext"
 import { useEffect } from "react"
 import { KompelloApi } from "~/lib/api/kompelloApi"
 import type { Company } from "~/lib/api/kompello"
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from "~/components/ui/card"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -23,6 +24,7 @@ export async function clientLoader() {
 export default function Home({ loaderData }: { loaderData: Company[] }) {
     const { setTitle } = useTitle()
     const navigate = useNavigate()
+    const { t } = useTranslation();
 
     useEffect(() => {
         setTitle("Home")
@@ -36,15 +38,15 @@ export default function Home({ loaderData }: { loaderData: Company[] }) {
                     <CardDescription>{company.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button onClick={() => navigate(`/${company.uuid}`)}>Open</Button>
+                    <Button onClick={() => navigate(`/${company.uuid}`)}>{t("actions.open")}</Button>
                 </CardContent>
             </Card>
         )
     }
     return (
         <div className="flex flex-col items-center justify-center min-h-svh">
-            <h1 className="text-2xl font-bold mb-4">Welcome to Kompello</h1>
-            <p className="text-lg mb-8">Please select a company:</p>
+            <h1 className="text-2xl font-bold mb-4">{t("views.appEntry.title")}</h1>
+            <p className="text-lg mb-8">{t("views.appEntry.description")}</p>
             {loaderData.map(renderCompany)}
         </div>
     )

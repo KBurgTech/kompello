@@ -1,0 +1,62 @@
+{
+    "actions": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "save": "Save",
+        "update": "Update",
+        "login": "Login",
+        "open": "Open"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success",
+        "noData": "No data available",
+        "search": "Search",
+        "select": "Select",
+        "yes": "Yes",
+        "no": "No"
+    },
+    "views": {
+        "login": {
+            "title": "Login",
+            "description": "Enter your email below to login to your account!",
+            "username": "Email",
+            "usernameDescription": "This is the email you used to register.",
+            "password": "Password",
+            "passwordDescription": "This is your account password.",
+            "loginFailureTitle": "Login Failed",
+            "loginFailureDescription": "Authenticating you in with the provided credentials failed. Please check your username and password."
+        },
+        "appEntry": {
+            "title": "Welcome to Kompello",
+            "description": "Please select a company"
+        },
+        "sideBar": {
+            "dashboard": "Dashboard",
+            "settings": {
+                "title": "Settings",
+                "system": "System Settings",
+                "company": "Company Settings"
+            }
+        },
+        "sideBarUser": {
+            "account": "Account",
+            "language": "Language",
+            "logout": "Logout"
+        },
+        "companySettings": {
+            "settings": "Company Settings",
+            "basic": {
+                "title": "Basic Settings",
+                "description": "Change the company name and description.",
+                "companyName": "Company Name",
+                "companyNameDescription": "The name of your company as it will appear in the application.",
+                "companyDescription": "Company Description",
+                "companyDescriptionDescription": "The description of your company as it will appear in the application."
+            }
+        }
+    }
+}

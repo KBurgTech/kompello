@@ -28,6 +28,7 @@ import { SideBarUser } from "./appSideBarUser"
 import ThemeSwitcher from "./themeSwitcher"
 import type { Company } from "~/lib/api/kompello"
 import { NavLink } from "react-router"
+import { useTranslation } from 'react-i18next';
 
 interface MenuItem {
     type: "group" | "single" | "multi",
@@ -40,23 +41,23 @@ interface MenuItem {
 const menuItems = (baseUrl: string): MenuItem[] => [
     {
         type: "single",
-        title: "Dashboard",
+        title: "views.sideBar.dashboard",
         icon: LayoutDashboard,
         href: `/${baseUrl}`,
     },
     {
         type: "group",
-        title: "Settings",
+        title: "views.sideBar.settings.title",
         children: [
             {
                 type: "single",
-                title: "System Settings",
+                title: "views.sideBar.settings.system",
                 icon: Settings,
                 href: `/settings/system`,
             },
             {
                 type: "single",
-                title: "Business Settings",
+                title: "views.sideBar.settings.company",
                 icon: BriefcaseBusiness,
                 href: `/${baseUrl}/settings`,
             }
@@ -103,8 +104,9 @@ function checkActive(item: MenuItem): boolean {
 }
 
 function renderGroup(item: MenuItem): React.ReactNode {
+    const { t } = useTranslation(); 
     return (<>
-        <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+        <SidebarGroupLabel>{t(item.title)}</SidebarGroupLabel>
         <SidebarMenu>
             {item.children && item.children.map(renderMenuItem)}
         </SidebarMenu></>
@@ -112,13 +114,14 @@ function renderGroup(item: MenuItem): React.ReactNode {
 }
 
 function renderSingleMenuItem(item: MenuItem): React.ReactNode {
+    const { t } = useTranslation(); 
     return (
         <SidebarMenu>
             <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild isActive={checkActive(item)}>
                     <NavLink to={item.href}>
                         {item.icon && <item.icon />}
-                        <span>{item.title}</span></NavLink>
+                        <span>{t(item.title)}</span></NavLink>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
@@ -126,12 +129,13 @@ function renderSingleMenuItem(item: MenuItem): React.ReactNode {
 }
 
 function renderSubMenuItem(item: MenuItem): React.ReactNode {
+    const { t } = useTranslation(); 
     return (
         <SidebarMenuSubItem key={item.title}>
             <SidebarMenuButton asChild isActive={checkActive(item)}>
                 <NavLink to={item.href}>
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    <span>{t(item.title)}</span>
                 </NavLink>
             </SidebarMenuButton>
         </SidebarMenuSubItem>
@@ -139,7 +143,7 @@ function renderSubMenuItem(item: MenuItem): React.ReactNode {
 }
 
 function renderMultiMenuItem(item: MenuItem): React.ReactNode {
-    const Icon = item.icon
+    const { t } = useTranslation(); 
     return (
         <SidebarMenu>
             <Collapsible asChild className="group/collapsible">
@@ -147,7 +151,7 @@ function renderMultiMenuItem(item: MenuItem): React.ReactNode {
                     <CollapsibleTrigger asChild>
                         <SidebarMenuButton tooltip={item.title}>
                             {item.icon && <item.icon />}
-                            <span>{item.title}</span>
+                            <span>{t(item.title)}</span>
                             <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         </SidebarMenuButton>
                     </CollapsibleTrigger>

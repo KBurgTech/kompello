@@ -9,6 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import './i18n';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

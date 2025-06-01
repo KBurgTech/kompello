@@ -1,6 +1,5 @@
 import {
     BadgeCheck,
-    Bell,
     ChevronsUpDown,
     LogOut,
 } from "lucide-react"
@@ -15,7 +14,13 @@ import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import {
@@ -25,10 +30,21 @@ import {
     useSidebar,
 } from "~/components/ui/sidebar"
 import { useAuth } from "../authContext"
+import i18n, { changeLanguage } from "~/i18n"
+import { useState } from "react"
+import { useTranslation } from 'react-i18next';
 
 export function SideBarUser() {
     const { isMobile } = useSidebar()
     const { user, logout } = useAuth()
+    const [language, setLanguage] = useState<string>(i18n.language)
+    const { t } = useTranslation();
+
+    const changeLanguageHandler = (lng: string) => {
+        changeLanguage(lng)
+        setLanguage(i18n.language)
+    }
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -82,17 +98,26 @@ export function SideBarUser() {
                             <DropdownMenuGroup>
                                 <DropdownMenuItem>
                                     <BadgeCheck />
-                                    Account
+                                    {t("views.sideBarUser.account")}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Bell />
-                                    Notifications
-                                </DropdownMenuItem>
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>
+                                            {t("views.sideBarUser.language")}
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuRadioGroup value={language} onValueChange={changeLanguageHandler}>
+                                                <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="de">Deutsch</DropdownMenuRadioItem>
+                                            </DropdownMenuRadioGroup>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                </DropdownMenuSub>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={logout}>
                                 <LogOut />
-                                Log out
+                                {t("views.sideBarUser.logout")}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
