@@ -19,8 +19,8 @@ function PrivateRoute(): JSX.Element {
     const auth = useAuth();
 
     useEffect(() => {
-        if (!auth.user) {
-            navigate("/auth/login");
+        if (!auth.user && auth.sessionLoading !== null && !auth.sessionLoading) {
+            navigate("/auth/login?redirectTo=" + encodeURIComponent(window.location.pathname + window.location.search), { replace: true });
         }
     }, [auth.user]);
 

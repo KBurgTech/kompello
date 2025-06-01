@@ -7,7 +7,14 @@ import {
     SidebarTrigger,
 } from "./ui/sidebar"
 import { useTitle } from "./titleContext"
-import type { JSX } from "react"
+import { type JSX } from "react"
+import { KompelloApi } from "~/lib/api/kompelloApi"
+import type { Company } from "~/lib/api/kompello"
+
+export async function clientLoader({ params }) {
+    const data = await KompelloApi.companyApi.companiesRetrieve({ uuid: params.companyId })
+    return data;
+}
 
 /**
  * The `AppLayout` component provides the main layout structure for the application.
@@ -17,11 +24,12 @@ import type { JSX } from "react"
  *
  * @returns {JSX.Element} The layout structure including sidebar, header, and content outlet.
  */
-export default function AppLayout(): JSX.Element {
+export default function AppLayout({ loaderData }: { loaderData: Company }): JSX.Element {
     const { title } = useTitle()
+
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar company={loaderData} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2">
                     <div className="flex items-center gap-2 px-4">
@@ -31,7 +39,9 @@ export default function AppLayout(): JSX.Element {
                     </div>
                 </header>
                 <Separator orientation="horizontal" />
-                <Outlet />
+                <div className="flex flex-1 flex-col gap-4 p-4">
+                    <Outlet context={loaderData} />
+                </div>
             </SidebarInset>
         </SidebarProvider>
     )

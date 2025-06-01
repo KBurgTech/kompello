@@ -4,6 +4,7 @@ import {
     ChevronRight,
     Command,
     LayoutDashboard,
+    Replace,
     Settings,
     type LucideIcon,
 } from "lucide-react"
@@ -16,6 +17,7 @@ import {
     SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
+    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
@@ -24,6 +26,8 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
 import { SideBarUser } from "./appSideBarUser"
 import ThemeSwitcher from "./themeSwitcher"
+import type { Company } from "~/lib/api/kompello"
+import { NavLink } from "react-router"
 
 interface MenuItem {
     type: "group" | "single" | "multi",
@@ -33,12 +37,12 @@ interface MenuItem {
     children?: MenuItem[],
 }
 
-const menuItems: MenuItem[] = [
+const menuItems = (baseUrl: string): MenuItem[] => [
     {
         type: "single",
         title: "Dashboard",
         icon: LayoutDashboard,
-        href: "/",
+        href: `/${baseUrl}`,
     },
     {
         type: "group",
@@ -48,13 +52,13 @@ const menuItems: MenuItem[] = [
                 type: "single",
                 title: "System Settings",
                 icon: Settings,
-                href: "/settings/system",
+                href: `/settings/system`,
             },
             {
                 type: "single",
                 title: "Business Settings",
                 icon: BriefcaseBusiness,
-                href: "/settings/business",
+                href: `/${baseUrl}/settings`,
             }
         ]
     },
@@ -112,10 +116,9 @@ function renderSingleMenuItem(item: MenuItem): React.ReactNode {
         <SidebarMenu>
             <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild isActive={checkActive(item)}>
-                    <a href={item.href}>
+                    <NavLink to={item.href}>
                         {item.icon && <item.icon />}
-                        <span>{item.title}</span>
-                    </a>
+                        <span>{item.title}</span></NavLink>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
@@ -126,10 +129,10 @@ function renderSubMenuItem(item: MenuItem): React.ReactNode {
     return (
         <SidebarMenuSubItem key={item.title}>
             <SidebarMenuButton asChild isActive={checkActive(item)}>
-                <a href={item.href}>
+                <NavLink to={item.href}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
-                </a>
+                </NavLink>
             </SidebarMenuButton>
         </SidebarMenuSubItem>
     )
@@ -170,7 +173,7 @@ function renderMenuItem(item: MenuItem): React.ReactNode {
     }
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ company, ...props }: { company: Company }) {
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
@@ -181,17 +184,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                     <Command className="size-4" />
                                 </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">Acme Inc</span>
-                                    <span className="truncate text-xs">Enterprise</span>
+                                <div className="grid flex-1 text-left text-sm">
+                                    <span className="truncate font-semibold">{company.name}</span>
                                 </div>
                             </a>
                         </SidebarMenuButton>
+                        <SidebarMenuAction asChild>
+                            <a href="/" className="flex aspect-square size-8 items-center justify-center">
+                                <Replace className="size-4" />
+                            </a>
+                        </SidebarMenuAction>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                {menuItems.map((item, index) => {
+                {menuItems(company.uuid).map((item, index) => {
                     return <SidebarGroup key={index}>
                         {renderMenuItem(item)}
                     </SidebarGroup>

@@ -65,7 +65,10 @@ export default function Login(): JSX.Element {
         setLoginInProgress(false)
 
         if (success) {
-            navigate("/")
+            // If login is successful, redirect to the content of redirectTo
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectTo = urlParams.get("redirectTo") || "/";
+            navigate(redirectTo);
         }
     }
 

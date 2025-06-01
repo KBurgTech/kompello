@@ -16,6 +16,7 @@ const LOGIN_CHANGE_EVENT = "KOMPELLO_LOGIN_CHANGE_EVENT";
  */
 interface AuthContextType {
     user: any;
+    sessionLoading: boolean;
     login: (username: string, password: string) => Promise<boolean>;
     logout: () => void;
 }
@@ -64,7 +65,7 @@ function Loading(): JSX.Element {
  */
 export function AuthProvider({ children }) {
     const [user, setUser] = useState<any>(null);
-    const [sessionLoading, setSessionLoading] = useState<boolean>(false);
+    const [sessionLoading, setSessionLoading] = useState<boolean>(null);
 
     /**
      * Checks the current authentication session by calling the backend API.
@@ -151,7 +152,7 @@ export function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, sessionLoading, login, logout }}>
             {sessionLoading ? <Loading /> : children}
         </AuthContext.Provider>
     );
