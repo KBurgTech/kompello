@@ -123,8 +123,74 @@ class CompanyApiViewsetTest(BaseTestCase):
                 },
             )
             self.assertEqual(response.status_code, 404)
+    
+    def test_members_add(self):
+        # Test adding members to a company
+        company = self.create_company(1)[0]
+        user = self.users[0]
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.admin_users[0],
+            {
+                "path": reverse("core:companies-members-add", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(user, company.members.all())
+        self.assertEqual(1, company.members.all().count())
 
-class CompanyApiPermssions(BaseTestCase):
+        # Test adding multiple ids of the same user results in no duplicates
+        company = self.create_company(1)[0]
+        user = self.users[0]
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.admin_users[0],
+            {
+                "path": reverse("core:companies-members-add", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid), str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(user, company.members.all())
+        self.assertEqual(1, company.members.all().count())
+
+    def test_members_delete(self):
+        # Test deleting members from a company
+        company = self.create_company(1)[0]
+        user = self.users[0]
+        company.members.add(user)
+        self.assertIn(user, company.members.all())
+        self.assertEqual(1, company.members.all().count())
+
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.admin_users[0],
+            {
+                "path": reverse("core:companies-members-delete", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertNotIn(user, company.members.all())
+        self.assertEqual(0, company.members.all().count())
+
+        # Test removing multiple ids of the same user results in no errors
+        company = self.create_company(1)[0]
+        user = self.users[0]
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.admin_users[0],
+            {
+                "path": reverse("core:companies-members-delete", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid), str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertNotIn(user, company.members.all())
+        self.assertEqual(0, company.members.all().count())
+
+class CompanyApiPermissions(BaseTestCase):
     def setUp(self):
         self.admin_users = self.create_admin_user(1)
         self.users = self.create_user(5)
@@ -324,4 +390,106 @@ class CompanyApiPermssions(BaseTestCase):
             },
         )
         self.assertEqual(response.status_code, 401)
-        
+
+    def test_members_add_permissions(self):
+        # Admin user should be able to add members to a company
+        company = self.companies[0]
+        user = self.users[0]
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.admin_users[0],
+            {
+                "path": reverse("core:companies-members-add", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(user, company.members.all())
+
+        # Regular non member user should not be able to add members to a company
+        company = self.companies[1]
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.users[0],
+            {
+                "path": reverse("core:companies-members-add", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+
+        # Member of the company should be able to add members to a company
+        company = self.companies[2]
+        company.members.add(self.users[0])
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.users[0],
+            {
+                "path": reverse("core:companies-members-add", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(self.users[1].uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+
+        # Non logged in user should not be able to add members to a company
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            None,
+            {
+                "path": reverse("core:companies-members-add", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 401)
+    
+    def test_members_delete_permissions(self):
+        # Admin user should be able to delete members from a company
+        company = self.companies[0]
+        user = self.users[0]
+        company.members.add(user)
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.admin_users[0],
+            {
+                "path": reverse("core:companies-members-delete", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertNotIn(user, company.members.all())
+
+        # Regular non member user should not be able to delete members from a company
+        company = self.companies[1]
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.users[0],
+            {
+                "path": reverse("core:companies-members-delete", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+
+        # Member of the company should be able to delete members from a company
+        company = self.companies[2]
+        company.members.add(self.users[0])
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            self.users[0],
+            {
+                "path": reverse("core:companies-members-delete", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(self.users[1].uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 204)
+
+        # Non logged in user should not be able to delete members from a company
+        response = self.authenticated_request(
+            HTTPMethod.PATCH,
+            None,
+            {
+                "path": reverse("core:companies-members-delete", kwargs={"uuid": company.uuid}),
+                "data": {"uuids": [str(user.uuid)]},
+            },
+        )
+        self.assertEqual(response.status_code, 401)

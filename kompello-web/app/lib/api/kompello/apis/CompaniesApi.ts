@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   Company,
   PatchedCompany,
+  PatchedUuidList,
   User,
 } from '../models/index';
 import {
@@ -24,6 +25,8 @@ import {
     CompanyToJSON,
     PatchedCompanyFromJSON,
     PatchedCompanyToJSON,
+    PatchedUuidListFromJSON,
+    PatchedUuidListToJSON,
     UserFromJSON,
     UserToJSON,
 } from '../models/index';
@@ -52,6 +55,16 @@ export interface CompaniesUpdateRequest {
 
 export interface CompanyMembersRequest {
     uuid: string;
+}
+
+export interface CompanyMembersAddRequest {
+    uuid: string;
+    patchedUuidList?: PatchedUuidList;
+}
+
+export interface CompanyMembersDeleteRequest {
+    uuid: string;
+    patchedUuidList?: PatchedUuidList;
 }
 
 /**
@@ -305,6 +318,82 @@ export class CompaniesApi extends runtime.BaseAPI {
     async companyMembers(requestParameters: CompanyMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<User>> {
         const response = await this.companyMembersRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Adds members to a company (does not include customers).
+     */
+    async companyMembersAddRaw(requestParameters: CompanyMembersAddRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['uuid'] == null) {
+            throw new runtime.RequiredError(
+                'uuid',
+                'Required parameter "uuid" was null or undefined when calling companyMembersAdd().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/companies/{uuid}/members_add/`.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PatchedUuidListToJSON(requestParameters['patchedUuidList']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Adds members to a company (does not include customers).
+     */
+    async companyMembersAdd(requestParameters: CompanyMembersAddRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.companyMembersAddRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Removes members from a company (does not include customers).
+     */
+    async companyMembersDeleteRaw(requestParameters: CompanyMembersDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['uuid'] == null) {
+            throw new runtime.RequiredError(
+                'uuid',
+                'Required parameter "uuid" was null or undefined when calling companyMembersDelete().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/companies/{uuid}/members_delete/`.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PatchedUuidListToJSON(requestParameters['patchedUuidList']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Removes members from a company (does not include customers).
+     */
+    async companyMembersDelete(requestParameters: CompanyMembersDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.companyMembersDeleteRaw(requestParameters, initOverrides);
     }
 
 }

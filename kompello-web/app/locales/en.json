@@ -8,7 +8,8 @@
         "update": "Update",
         "login": "Login",
         "open": "Open",
-        "back": "Back"
+        "back": "Back",
+        "select": "Select"
     },
     "common": {
         "loading": "Loading...",
@@ -16,7 +17,6 @@
         "success": "Success",
         "noData": "No data available",
         "search": "Search",
-        "select": "Select",
         "yes": "Yes",
         "no": "No",
         "name": "Name",
@@ -26,7 +26,8 @@
         "username": "Username",
         "firstName": "First Name",
         "lastName": "Last Name",
-        "confirmationRequired": "Please confirm"
+        "confirmationRequired": "Please confirm",
+        "actions": "Actions"
     },
     "views": {
         "login": {
@@ -65,6 +66,10 @@
                 "companyNameDescription": "The name of your company as it will appear in the application.",
                 "companyDescription": "Company Description",
                 "companyDescriptionDescription": "The description of your company as it will appear in the application."
+            },
+            "members": {
+                "title": "Manage Members",
+                "description": "Manage the members of your company."
             }
         },
         "accountSettings": {
@@ -85,6 +90,10 @@
                 "passwordMatchError": "Passwords must match",
                 "saveConfirmation": "Please confirm your password change. Changing the password will require you to log in again!"
             }
+        },
+        "userSelect": {
+            "title": "Select User",
+            "description": "Please select a user to continue."
         }
     }
 }

@@ -9,6 +9,7 @@ models/Csrf.ts
 models/Password.ts
 models/PatchedCompany.ts
 models/PatchedUser.ts
+models/PatchedUuidList.ts
 models/User.ts
 models/index.ts
 runtime.ts

@@ -16,8 +16,8 @@ paths:
       tags:
       - companies
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -44,8 +44,8 @@ paths:
               $ref: '#/components/schemas/Company'
         required: true
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '201':
           content:
@@ -66,8 +66,8 @@ paths:
       tags:
       - companies
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -99,8 +99,8 @@ paths:
               $ref: '#/components/schemas/Company'
         required: true
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -131,8 +131,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedCompany'
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -152,8 +152,8 @@ paths:
       tags:
       - companies
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '204':
           description: No response body
@@ -171,8 +171,8 @@ paths:
       tags:
       - companies
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -182,6 +182,66 @@ paths:
                 items:
                   $ref: '#/components/schemas/User'
           description: ''
+  /api/companies/{uuid}/members_add/:
+    patch:
+      operationId: company_members_add
+      description: Adds members to a company (does not include customers).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - companies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUuidList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUuidList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUuidList'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/companies/{uuid}/members_delete/:
+    patch:
+      operationId: company_members_delete
+      description: Removes members from a company (does not include customers).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - companies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUuidList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUuidList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUuidList'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
   /api/schema/:
     get:
       operationId: schema_retrieve
@@ -305,8 +365,8 @@ paths:
       tags:
       - schema
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -335,8 +395,8 @@ paths:
       tags:
       - system
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -351,8 +411,8 @@ paths:
       tags:
       - users
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -379,9 +439,8 @@ paths:
               $ref: '#/components/schemas/User'
         required: true
       security:
-      - cookieAuth: []
       - basicAuth: []
-      - {}
+      - cookieAuth: []
       responses:
         '201':
           content:
@@ -402,8 +461,8 @@ paths:
       tags:
       - users
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -435,8 +494,8 @@ paths:
               $ref: '#/components/schemas/User'
         required: true
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -467,8 +526,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedUser'
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -488,8 +547,8 @@ paths:
       tags:
       - users
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '204':
           description: No response body
@@ -519,8 +578,8 @@ paths:
               $ref: '#/components/schemas/Password'
         required: true
       security:
-      - cookieAuth: []
       - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           description: No response body
@@ -533,9 +592,8 @@ paths:
       tags:
       - users
       security:
-      - cookieAuth: []
       - basicAuth: []
-      - {}
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -647,6 +705,14 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedUuidList:
+      type: object
+      properties:
+        uuids:
+          type: array
+          items:
+            type: string
+            format: uuid
     User:
       type: object
       properties:

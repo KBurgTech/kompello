@@ -5,8 +5,9 @@ from rest_framework.generics import QuerySet
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from kompello.core.models import Company
+from kompello.core.models import Company, KompelloUser
 from kompello.core.permissions import NoOne
+from kompello.core.serializers.base_serializers import UuidListSerializer
 from kompello.core.serializers.company_serializers import CompanySerializer
 from kompello.core.serializers.user_serializers import UserSerializer
 from kompello.core.views.api.base import BaseModelViewSet
@@ -64,3 +65,39 @@ class CompanyViewSet(BaseModelViewSet):
         company = self.get_object()
         serializer = UserSerializer(company.members.all(), many=True)
         return Response(serializer.data)
+
+    @extend_schema(
+        request=UuidListSerializer(),
+        responses={200: {}},
+        description="Adds members to a company (does not include customers).",
+        operation_id="company_members_add",
+    )
+    @action(detail=True, methods=["patch"])
+    @permission_classes([IsMemberOfCompany | permissions.IsAdminUser])
+    def members_add(self, request: Request, uuid=None):
+        company = self.get_object()
+        serializer = UuidListSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            uuids = serializer.validated_data["uuids"]
+            users = KompelloUser.objects.filter(uuid__in=uuids)
+            company.members.add(*users)
+
+        return Response(status=201)
+
+    @extend_schema(
+        request=UuidListSerializer(),
+        responses={200: {}},
+        description="Removes members from a company (does not include customers).",
+        operation_id="company_members_delete",
+    )
+    @action(detail=True, methods=["patch"])
+    @permission_classes([IsMemberOfCompany | permissions.IsAdminUser])
+    def members_delete(self, request: Request, uuid=None):
+        company = self.get_object()
+        serializer = UuidListSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            uuids = serializer.validated_data["uuids"]
+            users = KompelloUser.objects.filter(uuid__in=uuids)
+            company.members.remove(*users)
+
+        return Response(status=204)

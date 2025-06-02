@@ -5,4 +5,5 @@ export * from './Csrf';
 export * from './Password';
 export * from './PatchedCompany';
 export * from './PatchedUser';
+export * from './PatchedUuidList';
 export * from './User';
