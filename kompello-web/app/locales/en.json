@@ -7,7 +7,8 @@
         "save": "Save",
         "update": "Update",
         "login": "Login",
-        "open": "Open"
+        "open": "Open",
+        "back": "Back"
     },
     "common": {
         "loading": "Loading...",
@@ -17,7 +18,15 @@
         "search": "Search",
         "select": "Select",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "name": "Name",
+        "description": "Description",
+        "email": "Email",
+        "password": "Password",
+        "username": "Username",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "confirmationRequired": "Please confirm"
     },
     "views": {
         "login": {
@@ -56,6 +65,25 @@
                 "companyNameDescription": "The name of your company as it will appear in the application.",
                 "companyDescription": "Company Description",
                 "companyDescriptionDescription": "The description of your company as it will appear in the application."
+            }
+        },
+        "accountSettings": {
+            "settings": "Account Settings",
+            "basic": {
+                "title": "Basic Settings",
+                "description": "Change your personal and contact details.",
+                "firstNameDescription": "This is your first name as it will appear in the application.",
+                "lastNameDescription": "This is your last name as it will appear in the application.",
+                "emailDescription": "This is the email address associated with your account. (Also your login)"
+            },
+            "password": {
+                "title": "Password Settings",
+                "description": "Change your account password.",
+                "passwordDescription": "Your new Password",
+                "passwordConfirmationDescription": "Please confirm your new Password",
+                "passwordLengthError": "Password must be at least {{length}} characters long",
+                "passwordMatchError": "Passwords must match",
+                "saveConfirmation": "Please confirm your password change. Changing the password will require you to log in again!"
             }
         }
     }

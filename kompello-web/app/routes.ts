@@ -14,7 +14,8 @@ export default [
                     index("routes/app/company/home.tsx"),
                     route("/settings", "routes/app/company/settings.tsx"),
                 ])
-            )
+            ),
+            route("account", "routes/app/account.tsx"),
         ])
     ])
 ] satisfies RouteConfig;

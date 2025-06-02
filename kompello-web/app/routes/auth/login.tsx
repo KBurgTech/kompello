@@ -51,6 +51,11 @@ export default function Login(): JSX.Element {
         },
     })
 
+    function getRedirectTo(): string {
+        // Extract the redirectTo parameter from the URL query string
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("redirectTo") || "/";
+    }
     /**
      * Handles the login process by authenticating the user with the provided credentials.
      * If authentication is successful, navigates to the home page.
@@ -65,19 +70,19 @@ export default function Login(): JSX.Element {
         const success = await auth.login(values.username, values.password)
         setLoginFailed(!success)
         setLoginInProgress(false)
-
+        console.log("Login attempt:", values.username, "Success:", success)
         if (success) {
-            // If login is successful, redirect to the content of redirectTo
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectTo = urlParams.get("redirectTo") || "/";
-            navigate(redirectTo);
+            // Wait for the auth state to update
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            navigate(getRedirectTo());
         }
     }
 
     useEffect(() => {
         // If the user is already authenticated, redirect to the home page
         if (auth.user) {
-            navigate("/");
+            console.log("Redirecting to:", getRedirectTo());
+            navigate(getRedirectTo());
         }
     }, []);
 

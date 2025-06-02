@@ -8,6 +8,7 @@ import type { Company } from "~/lib/api/kompello"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { useQuery } from '@tanstack/react-query'
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -16,12 +17,7 @@ export function meta({ }: Route.MetaArgs) {
     ]
 }
 
-export async function clientLoader() {
-    const data = await KompelloApi.companyApi.companiesList()
-    return data;
-}
-
-export default function Home({ loaderData }: { loaderData: Company[] }) {
+export default function Home() {
     const { setTitle } = useTitle()
     const navigate = useNavigate()
     const { t } = useTranslation();
@@ -29,6 +25,14 @@ export default function Home({ loaderData }: { loaderData: Company[] }) {
     useEffect(() => {
         setTitle("Home")
     }, [])
+
+    const query = useQuery({ 
+        queryKey: ["companies"],
+        queryFn: async () => {
+            const companyData = await KompelloApi.companyApi.companiesList();
+            return companyData;
+        }
+    })
 
     function renderCompany(company: Company) {
         return (
@@ -47,7 +51,7 @@ export default function Home({ loaderData }: { loaderData: Company[] }) {
         <div className="flex flex-col items-center justify-center min-h-svh">
             <h1 className="text-2xl font-bold mb-4">{t("views.appEntry.title")}</h1>
             <p className="text-lg mb-8">{t("views.appEntry.description")}</p>
-            {loaderData.map(renderCompany)}
+            {query.data?.map(renderCompany)}
         </div>
     )
 }

@@ -9,12 +9,9 @@ import {
 import { useTitle } from "./titleContext"
 import { type JSX } from "react"
 import { KompelloApi } from "~/lib/api/kompelloApi"
-import type { Company } from "~/lib/api/kompello"
-
-export async function clientLoader({ params }) {
-    const data = await KompelloApi.companyApi.companiesRetrieve({ uuid: params.companyId })
-    return data;
-}
+import type { Route } from "../+types/root"
+import { useQuery } from '@tanstack/react-query'
+import { useAuth } from "./authContext"
 
 /**
  * The `AppLayout` component provides the main layout structure for the application.
@@ -24,12 +21,22 @@ export async function clientLoader({ params }) {
  *
  * @returns {JSX.Element} The layout structure including sidebar, header, and content outlet.
  */
-export default function AppLayout({ loaderData }: { loaderData: Company }): JSX.Element {
+export default function AppLayout({ params }: Route.ComponentProps): JSX.Element {
     const { title } = useTitle()
+    const auth = useAuth()
+
+    const query = useQuery({ 
+        queryKey: ["company", params.companyId],
+        queryFn: async () => {
+            const companyData = await KompelloApi.companyApi.companiesRetrieve({ uuid: params.companyId });
+            return companyData;
+        }
+    })
 
     return (
+        query.data &&
         <SidebarProvider>
-            <AppSidebar company={loaderData} />
+            <AppSidebar company={query.data} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2">
                     <div className="flex items-center gap-2 px-4">
@@ -40,7 +47,7 @@ export default function AppLayout({ loaderData }: { loaderData: Company }): JSX.
                 </header>
                 <Separator orientation="horizontal" />
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                    <Outlet context={loaderData} />
+                    <Outlet context={query.data} />
                 </div>
             </SidebarInset>
         </SidebarProvider>

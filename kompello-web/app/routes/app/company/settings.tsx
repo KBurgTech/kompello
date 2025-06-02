@@ -1,7 +1,7 @@
 import type { Route } from "./+types/settings"
 import { useTitle } from "~/components/titleContext"
 import { useEffect } from "react"
-import { useOutletContext, useNavigate } from "react-router"
+import { useOutletContext } from "react-router"
 import type { Company} from "~/lib/api/kompello"
 import z from "zod"
 import { useForm } from "react-hook-form"
@@ -14,6 +14,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent }
 import ActionButton from "~/components/actionButton"
 import { KompelloApi } from "~/lib/api/kompelloApi"
 import { useTranslation } from "react-i18next"
+import { useQueryClient } from '@tanstack/react-query'
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -30,15 +31,16 @@ const companySchema = z.object({
 export default function Settings() {
     const { setTitle } = useTitle()
     const context = useOutletContext<Company>()
-    const navigate = useNavigate()
     const { t } = useTranslation();
-    
+    const queryClient = useQueryClient()
+
     useEffect(() => {
         setTitle(`${t("views.companySettings.settings")} - ${context.name || "Company"}`)
-    }, [])
+    }, [context.name])
 
     const form = useForm<z.infer<typeof companySchema>>({
         resolver: zodResolver(companySchema),
+        mode: "onChange",
         defaultValues: {
             name: context.name || "",
             description: context.description || "",
@@ -53,7 +55,7 @@ export default function Settings() {
             }
         };
         await KompelloApi.companyApi.companiesPartialUpdate(content);
-        navigate(0); // Refresh the page to reflect changes
+        queryClient.invalidateQueries({queryKey: ["company", context.uuid]});
     }
 
     return (

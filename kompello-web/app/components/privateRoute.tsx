@@ -24,6 +24,10 @@ function PrivateRoute(): JSX.Element {
         }
     }, [auth.user]);
 
+    if (auth.sessionLoading === null || auth.sessionLoading || !auth.user) {
+        return null
+    }
+
     return <Outlet />;
 }
 

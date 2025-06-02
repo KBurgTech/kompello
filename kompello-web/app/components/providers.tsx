@@ -3,7 +3,7 @@ import { AuthProvider } from "./authContext";
 import { Outlet } from "react-router";
 import { TitleProvider } from "./titleContext";
 import { ThemeProvider } from "./themeContext";
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 /**
  * Composes and provides application-wide context providers.
  *
@@ -13,15 +13,18 @@ import { ThemeProvider } from "./themeContext";
  *
  * @returns {JSX.Element} The composed context providers with nested route outlet.
  */
+const queryClient = new QueryClient()
 function Providers(): JSX.Element {
     return (
-        <ThemeProvider>
-            <TitleProvider>
-                <AuthProvider>
-                    <Outlet />
-                </AuthProvider>
-            </TitleProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider>
+                <TitleProvider>
+                    <AuthProvider>
+                        <Outlet />
+                    </AuthProvider>
+                </TitleProvider>
+            </ThemeProvider>
+        </QueryClientProvider>
     );
 }
 

@@ -1,10 +1,9 @@
-import { createContext, useContext, useState, useEffect, type JSX } from "react";
-import type { AuthenticatedResponse } from "~/lib/api/allauth";
+import { createContext, useContext, type JSX } from "react";
 import { KompelloApi } from "~/lib/api/kompelloApi";
 import { Skeleton } from "./ui/skeleton";
 import { Loader2 } from "lucide-react";
-
-const LOGIN_CHANGE_EVENT = "KOMPELLO_LOGIN_CHANGE_EVENT";
+import type { User } from "~/lib/api/kompello";
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
  * Represents the authentication context for the application.
@@ -15,8 +14,8 @@ const LOGIN_CHANGE_EVENT = "KOMPELLO_LOGIN_CHANGE_EVENT";
  * @property logout - Function to log out the current user.
  */
 interface AuthContextType {
-    user: any;
-    sessionLoading: boolean;
+    user: User | null;
+    sessionLoading: boolean | null;
     login: (username: string, password: string) => Promise<boolean>;
     logout: () => void;
 }
@@ -64,50 +63,21 @@ function Loading(): JSX.Element {
  * ```
  */
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState<any>(null);
-    const [sessionLoading, setSessionLoading] = useState<boolean>(null);
-
-    /**
-     * Checks the current authentication session by calling the backend API.
-     * 
-     * - Prevents concurrent session checks if one is already in progress.
-     * - Sets the loading state while the session is being checked.
-     * - On success (HTTP 200), updates the user state with the authenticated user data.
-     * - On failure or error, resets the user state to null.
-     * - Always resets the loading state after completion.
-     *
-     * @async
-     * @returns {Promise<void>} Resolves when the session check is complete.
-     */
-    async function checkSession(): Promise<void> {
-        if (sessionLoading) return; // Prevent multiple calls
-        setSessionLoading(true);
-        let response: AuthenticatedResponse;
-
-        try {
-            response = await KompelloApi.currentSessionApi.allauthClientV1AuthSessionGet({ client: "browser" });
-        } catch (error) {
-            setUser(null);
-            setSessionLoading(false);
-            return;
+    const queryClient = useQueryClient();
+    const currentUserQuery = useQuery({
+        queryKey: ["currentuser"],
+        queryFn: async () => {
+            try {
+                console.log("Checking current user session...");
+                await KompelloApi.currentSessionApi.allauthClientV1AuthSessionGet({ client: "browser" });
+                const user = await KompelloApi.userApi.usersMe();
+                return user;
+            } catch (error) {
+                return null;
+            }
         }
-        if (response.status === 200) {
-            setUser(response.data.user);
-        } else {
-            setUser(null);
-        }
-        setSessionLoading(false);
-    }
-
-    // Check session on initial load
-    useEffect(() => {
-        checkSession();
-    }, []);
-
-    // Listen for login change events to re-check the session
-    document.addEventListener(LOGIN_CHANGE_EVENT, async () => {
-        await checkSession();
-    });
+    })
+    
 
     /**
      * Attempts to log in a user with the provided username and password.
@@ -131,7 +101,7 @@ export function AuthProvider({ children }) {
                     phone: ""
                 },
             });
-            document.dispatchEvent(new CustomEvent(LOGIN_CHANGE_EVENT));
+            queryClient.invalidateQueries({ queryKey: ["currentuser"] });
             return true;
         } catch (error) {
             return false;
@@ -147,13 +117,13 @@ export function AuthProvider({ children }) {
     function logout(): void {
         KompelloApi.currentSessionApi.allauthClientV1AuthSessionDelete({ client: "browser" })
             .catch(() => {
-                document.dispatchEvent(new CustomEvent(LOGIN_CHANGE_EVENT));
+                queryClient.invalidateQueries({ queryKey: ["currentuser"] });
             });
     }
 
     return (
-        <AuthContext.Provider value={{ user, sessionLoading, login, logout }}>
-            {sessionLoading ? <Loading /> : children}
+        <AuthContext.Provider value={{ user: currentUserQuery.data, sessionLoading: currentUserQuery.isLoading, login, logout }}>
+            {currentUserQuery.isLoading ? <Loading /> : children}
         </AuthContext.Provider>
     );
 }
