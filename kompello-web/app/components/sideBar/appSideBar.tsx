@@ -116,7 +116,7 @@ function renderGroup(item: MenuItem): React.ReactNode {
 function renderSingleMenuItem(item: MenuItem): React.ReactNode {
     const { t } = useTranslation(); 
     return (
-        <SidebarMenu>
+        <SidebarMenu key={item.href}>
             <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild isActive={checkActive(item)}>
                     <NavLink to={item.href}>
@@ -145,7 +145,7 @@ function renderSubMenuItem(item: MenuItem): React.ReactNode {
 function renderMultiMenuItem(item: MenuItem): React.ReactNode {
     const { t } = useTranslation(); 
     return (
-        <SidebarMenu>
+        <SidebarMenu key={item.href}>
             <Collapsible asChild className="group/collapsible">
                 <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
