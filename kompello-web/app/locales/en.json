@@ -94,6 +94,11 @@
         "userSelect": {
             "title": "Select User",
             "description": "Please select a user to continue."
+        },
+        "pageNotFound": {
+            "title": "Page Not Found",
+            "description": "The page you are looking for does not exist.",
+            "backToHome": "Go to Home"
         }
     }
 }
