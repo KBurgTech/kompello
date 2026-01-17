@@ -242,6 +242,161 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/customers/:
+    get:
+      operationId: customers_list
+      description: List customers from companies the user is a member of.
+      tags:
+      - customers
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerList'
+          description: ''
+    post:
+      operationId: customers_create
+      description: |-
+        Create a new customer.
+        User must be a member of the specified company.
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+  /api/customers/{uuid}/:
+    get:
+      operationId: customers_retrieve
+      description: Retrieve a single customer.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - customers
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    put:
+      operationId: customers_update
+      description: Update a customer (full update).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    patch:
+      operationId: customers_partial_update
+      description: Update a customer (partial update).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    delete:
+      operationId: customers_destroy
+      description: Destroy is disabled. Use is_active flag instead to deactivate customers.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - customers
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/schema/:
     get:
       operationId: schema_retrieve
@@ -603,6 +758,54 @@ paths:
           description: ''
 components:
   schemas:
+    Address:
+      type: object
+      description: Serializer for the Address model.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        street:
+          type: string
+          description: Street address
+          maxLength: 255
+        street_2:
+          type: string
+          description: Additional street information (apartment, suite, etc.)
+          maxLength: 255
+        city:
+          type: string
+          description: City name
+          maxLength: 100
+        state:
+          type: string
+          description: State or province
+          maxLength: 100
+        postal_code:
+          type: string
+          description: Postal or ZIP code
+          maxLength: 20
+        country:
+          type: string
+          description: Country name
+          maxLength: 100
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - city
+      - country
+      - created_on
+      - modified_on
+      - postal_code
+      - street
+      - uuid
     Company:
       type: object
       properties:
@@ -642,6 +845,127 @@ components:
           type: string
       required:
       - csrfToken
+    Customer:
+      type: object
+      description: Serializer for the Customer model with nested address.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: Title (Mr., Ms., Dr., etc.)
+          maxLength: 50
+        firstname:
+          type: string
+          description: Customer's first name
+          maxLength: 100
+        lastname:
+          type: string
+          description: Customer's last name
+          maxLength: 100
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+          description: Customer's date of birth
+        email:
+          type: string
+          format: email
+          description: Customer email address
+          maxLength: 254
+        mobile_phone:
+          type: string
+          description: Customer mobile phone number
+          maxLength: 50
+        landline_phone:
+          type: string
+          description: Customer landline phone number
+          maxLength: 50
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          nullable: true
+        notes:
+          type: string
+          description: Additional notes about the customer
+        is_active:
+          type: boolean
+          description: Whether the customer is active
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - modified_on
+      - uuid
+    CustomerList:
+      type: object
+      description: Lightweight serializer for customer list views.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+          description: Title (Mr., Ms., Dr., etc.)
+        firstname:
+          type: string
+          readOnly: true
+          description: Customer's first name
+        lastname:
+          type: string
+          readOnly: true
+          description: Customer's last name
+        email:
+          type: string
+          format: email
+          readOnly: true
+          description: Customer email address
+        mobile_phone:
+          type: string
+          readOnly: true
+          description: Customer mobile phone number
+        landline_phone:
+          type: string
+          readOnly: true
+          description: Customer landline phone number
+        address_summary:
+          type: string
+          nullable: true
+          description: Return a brief address summary.
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          description: Whether the customer is active
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - address_summary
+      - created_on
+      - email
+      - firstname
+      - is_active
+      - landline_phone
+      - lastname
+      - mobile_phone
+      - title
+      - uuid
     Password:
       type: object
       properties:
@@ -667,6 +991,65 @@ components:
           format: uri
           readOnly: true
           nullable: true
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCustomer:
+      type: object
+      description: Serializer for the Customer model with nested address.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: Title (Mr., Ms., Dr., etc.)
+          maxLength: 50
+        firstname:
+          type: string
+          description: Customer's first name
+          maxLength: 100
+        lastname:
+          type: string
+          description: Customer's last name
+          maxLength: 100
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+          description: Customer's date of birth
+        email:
+          type: string
+          format: email
+          description: Customer email address
+          maxLength: 254
+        mobile_phone:
+          type: string
+          description: Customer mobile phone number
+          maxLength: 50
+        landline_phone:
+          type: string
+          description: Customer landline phone number
+          maxLength: 50
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          nullable: true
+        notes:
+          type: string
+          description: Additional notes about the customer
+        is_active:
+          type: boolean
+          description: Whether the customer is active
         created_on:
           type: string
           format: date-time
