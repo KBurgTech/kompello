@@ -16,6 +16,7 @@ router.register(r"system", SystemApiViews, basename="system")
 
 urlpatterns = [
     path("api/", include(router.urls)),
-    path("_test/create_dummy_user/", create_dummy_user, name="create_dummy_user"), # TODO remove this in production
-    re_path(r'^(?P<path>([^/]+/)*)$',  ViteView.as_view(), name='vite-view'),
+    path("_test/create_dummy_user/", create_dummy_user, name="create_dummy_user"),  # TODO remove this in production
+    path("ui/", ViteView.as_view(), name='vite-view'),
+    re_path(r'^ui/(?P<path>.*)$', ViteView.as_view(), name='vite-view-nested'),
 ]
