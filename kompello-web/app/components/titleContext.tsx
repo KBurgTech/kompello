@@ -1,8 +1,21 @@
 import { createContext, useContext, useState } from "react";
+import type { ReactNode } from "react";
+
+export interface BreadcrumbItem {
+    label: string;
+    href?: string;
+}
+
+export interface HeaderAction {
+    breadcrumbs?: BreadcrumbItem[];
+    rightContent?: ReactNode;
+}
 
 export const TitleContext = createContext({
     title: "",
-    setTitle: (title: string) => { }
+    setTitle: (title: string) => { },
+    headerAction: undefined as HeaderAction | undefined,
+    setHeaderAction: (action: HeaderAction | undefined) => { }
 });
 
 export const useTitle = () => useContext(TitleContext);
@@ -22,8 +35,9 @@ export const useTitle = () => useContext(TitleContext);
  */
 export function TitleProvider({ children }) {
     const [title, setTitle] = useState("");
+    const [headerAction, setHeaderAction] = useState<HeaderAction | undefined>(undefined);
     return (
-        <TitleContext.Provider value={{ title, setTitle }}>
+        <TitleContext.Provider value={{ title, setTitle, headerAction, setHeaderAction }}>
             {children}
         </TitleContext.Provider>
     );

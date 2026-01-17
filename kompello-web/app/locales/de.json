@@ -1,3 +1,137 @@
 {
-    
+    "actions": {
+        "add": "Hinzufügen",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "save": "Speichern",
+        "update": "Aktualisieren",
+        "login": "Anmelden",
+        "open": "Öffnen",
+        "back": "Zurück",
+        "select": "Auswählen"
+    },
+    "common": {
+        "loading": "Wird geladen...",
+        "error": "Ein Fehler ist aufgetreten",
+        "success": "Erfolg",
+        "noData": "Keine Daten verfügbar",
+        "search": "Suchen",
+        "yes": "Ja",
+        "no": "Nein",
+        "name": "Name",
+        "description": "Beschreibung",
+        "email": "E-Mail",
+        "password": "Passwort",
+        "username": "Benutzername",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "confirmationRequired": "Bitte bestätigen",
+        "actions": "Aktionen",
+        "notes": "Notizen",
+        "lastModified": "Zuletzt geändert",
+        "created": "Erstellt",
+        "saving": "Wird gespeichert..."
+    },
+    "views": {
+        "login": {
+            "title": "Anmelden",
+            "description": "Geben Sie Ihre E-Mail ein, um sich bei Ihrem Konto anzumelden!",
+            "username": "E-Mail",
+            "usernameDescription": "Dies ist die E-Mail, die Sie bei der Registrierung verwendet haben.",
+            "password": "Passwort",
+            "passwordDescription": "Dies ist Ihr Kontopasswort.",
+            "loginFailureTitle": "Anmeldung fehlgeschlagen",
+            "loginFailureDescription": "Die Authentifizierung mit den angegebenen Anmeldedaten ist fehlgeschlagen. Bitte überprüfen Sie Ihren Benutzernamen und Ihr Passwort."
+        },
+        "appEntry": {
+            "title": "Willkommen bei Kompello",
+            "description": "Bitte wählen Sie ein Unternehmen aus"
+        },
+        "sideBar": {
+            "dashboard": "Dashboard",
+            "customers": "Kunden",
+            "resources": "Ressourcen",
+            "settings": {
+                "title": "Einstellungen",
+                "system": "Systemeinstellungen",
+                "company": "Unternehmenseinstellungen"
+            }
+        },
+        "sideBarUser": {
+            "account": "Konto",
+            "language": "Sprache",
+            "logout": "Abmelden"
+        },
+        "companySettings": {
+            "settings": "Unternehmenseinstellungen",
+            "basic": {
+                "title": "Grundeinstellungen",
+                "description": "Ändern Sie den Unternehmesnamen und die Beschreibung.",
+                "companyName": "Unternehmensname",
+                "companyNameDescription": "Der Name Ihres Unternehmens, wie er in der Anwendung angezeigt wird.",
+                "companyDescription": "Unternehmensbeschreibung",
+                "companyDescriptionDescription": "Die Beschreibung Ihres Unternehmens, wie sie in der Anwendung angezeigt wird."
+            },
+            "members": {
+                "title": "Mitglieder verwalten",
+                "description": "Verwalten Sie die Mitglieder Ihres Unternehmens."
+            }
+        },
+        "accountSettings": {
+            "settings": "Kontoeinstellungen",
+            "basic": {
+                "title": "Grundeinstellungen",
+                "description": "Ändern Sie Ihre persönlichen Angaben und Kontaktinformationen.",
+                "firstNameDescription": "Dies ist Ihr Vorname, wie er in der Anwendung angezeigt wird.",
+                "lastNameDescription": "Dies ist Ihr Nachname, wie er in der Anwendung angezeigt wird.",
+                "emailDescription": "Dies ist die mit Ihrem Konto verbundene E-Mail-Adresse. (Auch Ihr Login)"
+            },
+            "password": {
+                "title": "Passworteinstellungen",
+                "description": "Ändern Sie Ihr Kontopasswort.",
+                "passwordDescription": "Ihr neues Passwort",
+                "passwordConfirmationDescription": "Bitte bestätigen Sie Ihr neues Passwort",
+                "passwordLengthError": "Das Passwort muss mindestens {{length}} Zeichen lang sein",
+                "passwordMatchError": "Die Passwörter müssen übereinstimmen",
+                "saveConfirmation": "Bitte bestätigen Sie Ihre Passwortänderung. Das Ändern des Passworts erfordert, dass Sie sich erneut anmelden!"
+            }
+        },
+        "userSelect": {
+            "title": "Benutzer auswählen",
+            "description": "Bitte wählen Sie einen Benutzer aus, um fortzufahren."
+        },
+        "pageNotFound": {
+            "title": "Seite nicht gefunden",
+            "description": "Die Seite, die Sie suchen, existiert nicht.",
+            "backToHome": "Zur Startseite"
+        },
+        "customers": {
+            "title": "Kunden",
+            "description": "Verwalten Sie Ihre Kunden und deren Kontaktinformationen.",
+            "addCustomer": "Kunde hinzufügen",
+            "addNewCustomer": "Neuen Kunden hinzufügen",
+            "name": "Name",
+            "mobilePhone": "Mobiltelefon",
+            "landlinePhone": "Festnetz",
+            "address": "Adresse",
+            "status": "Status",
+            "active": "Aktiv",
+            "inactive": "Inaktiv",
+            "personalInfo": "Persönliche Informationen",
+            "personalInfoDescription": "Geben Sie die persönlichen Daten des Kunden ein.",
+            "birthdate": "Geburtsdatum",
+            "contactInfo": "Kontaktinformationen",
+            "contactInfoDescription": "Geben Sie die Kontaktinformationen des Kunden ein.",
+            "addressDescription": "Geben Sie die Adresse des Kunden ein.",
+            "street": "Straße",
+            "street2": "Apt., Suite, etc.",
+            "city": "Stadt",
+            "state": "Bundesland/Kanton",
+            "postalCode": "Postleitzahl",
+            "country": "Land",
+            "notes": "Zusätzliche Notizen",
+            "notesDescription": "Fügen Sie zusätzliche Notizen zu diesem Kunden hinzu."
+        }
+    }
 }

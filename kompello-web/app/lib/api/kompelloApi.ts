@@ -1,7 +1,7 @@
 import { AuthenticationAccountApi } from "./allauth/apis/AuthenticationAccountApi";
 import { Configuration, type Middleware, type RequestContext, type ResponseContext } from "./allauth/runtime";
 import { AuthenticationCurrentSessionApi } from "./allauth/apis";
-import { CompaniesApi, SystemApi, UsersApi } from "./kompello";
+import { CompaniesApi, CustomersApi, SystemApi, UsersApi } from "./kompello";
 import { Configuration as KompelloConfiguration } from "./kompello/runtime";
 
 // Wrapper for the allauth API to handle session tokens and login state automatically for all API calls
@@ -49,6 +49,7 @@ class KompelloApiImpl {
     currentSessionApi: AuthenticationCurrentSessionApi;
     systemApi: SystemApi;
     companyApi: CompaniesApi;
+    customersApi: CustomersApi;
     userApi: UsersApi;
 
     constructor() {
@@ -56,6 +57,7 @@ class KompelloApiImpl {
         this.currentSessionApi = new AuthenticationCurrentSessionApi(allauthConfig);
         this.systemApi = new SystemApi(kompelloConfig);
         this.companyApi = new CompaniesApi(kompelloConfig);
+        this.customersApi = new CustomersApi(kompelloConfig);
         this.userApi = new UsersApi(kompelloConfig);
     }
 }

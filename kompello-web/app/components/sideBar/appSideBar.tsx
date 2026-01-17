@@ -6,6 +6,7 @@ import {
     LayoutDashboard,
     Replace,
     Settings,
+    Users,
     type LucideIcon,
 } from "lucide-react"
 
@@ -44,6 +45,18 @@ const menuItems = (baseUrl: string): MenuItem[] => [
         title: "views.sideBar.dashboard",
         icon: LayoutDashboard,
         href: `/${baseUrl}`,
+    },
+    {
+        type: "group",
+        title: "views.sideBar.resources",
+        children: [
+            {
+                type: "single",
+                title: "views.sideBar.customers",
+                icon: Users,
+                href: `/${baseUrl}/customers`,
+            },
+        ]
     },
     {
         type: "group",
@@ -104,7 +117,7 @@ function checkActive(item: MenuItem): boolean {
 }
 
 function renderGroup(item: MenuItem): React.ReactNode {
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
     return (<>
         <SidebarGroupLabel>{t(item.title)}</SidebarGroupLabel>
         <SidebarMenu>
@@ -114,7 +127,7 @@ function renderGroup(item: MenuItem): React.ReactNode {
 }
 
 function renderSingleMenuItem(item: MenuItem): React.ReactNode {
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
     return (
         <SidebarMenu key={item.href}>
             <SidebarMenuItem key={item.title}>
@@ -129,7 +142,7 @@ function renderSingleMenuItem(item: MenuItem): React.ReactNode {
 }
 
 function renderSubMenuItem(item: MenuItem): React.ReactNode {
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
     return (
         <SidebarMenuSubItem key={item.title}>
             <SidebarMenuButton asChild isActive={checkActive(item)}>
@@ -143,7 +156,7 @@ function renderSubMenuItem(item: MenuItem): React.ReactNode {
 }
 
 function renderMultiMenuItem(item: MenuItem): React.ReactNode {
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
     return (
         <SidebarMenu key={item.href}>
             <Collapsible asChild className="group/collapsible">
@@ -194,9 +207,9 @@ export function AppSidebar({ company, ...props }: { company: Company }) {
                             </a>
                         </SidebarMenuButton>
                         <SidebarMenuAction asChild>
-                            <a href="/" className="flex aspect-square size-8 items-center justify-center">
+                            <NavLink to={`/`}>
                                 <Replace className="size-4" />
-                            </a>
+                            </NavLink>
                         </SidebarMenuAction>
                     </SidebarMenuItem>
                 </SidebarMenu>

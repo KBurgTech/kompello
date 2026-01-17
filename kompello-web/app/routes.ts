@@ -13,6 +13,12 @@ export default [
                 prefix(":companyId", [
                     index("routes/app/company/home.tsx"),
                     route("/settings", "routes/app/company/settings.tsx"),
+                    layout("routes/app/company/customers/layout.tsx", 
+                        prefix("customers", [
+                            index("routes/app/company/customers/list.tsx"),
+                            route(":customerId", "routes/app/company/customers/detail.tsx"),
+                        ])
+                    ),
                 ])
             ),
             route("account", "routes/app/account.tsx"),

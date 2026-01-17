@@ -27,7 +27,11 @@
         "firstName": "First Name",
         "lastName": "Last Name",
         "confirmationRequired": "Please confirm",
-        "actions": "Actions"
+        "actions": "Actions",
+        "notes": "Notes",
+        "lastModified": "Last Modified",
+        "created": "Created",
+        "saving": "Saving..."
     },
     "views": {
         "login": {
@@ -46,6 +50,8 @@
         },
         "sideBar": {
             "dashboard": "Dashboard",
+            "customers": "Customers",
+            "resources": "Resources",
             "settings": {
                 "title": "Settings",
                 "system": "System Settings",
@@ -99,6 +105,33 @@
             "title": "Page Not Found",
             "description": "The page you are looking for does not exist.",
             "backToHome": "Go to Home"
+        },
+        "customers": {
+            "title": "Customers",
+            "description": "Manage your customers and their contact information.",
+            "addCustomer": "Add Customer",
+            "addNewCustomer": "Add New Customer",
+            "name": "Name",
+            "mobilePhone": "Mobile Phone",
+            "landlinePhone": "Landline Phone",
+            "address": "Address",
+            "status": "Status",
+            "active": "Active",
+            "inactive": "Inactive",
+            "personalInfo": "Personal Information",
+            "personalInfoDescription": "Enter the customer's personal details.",
+            "birthdate": "Date of Birth",
+            "contactInfo": "Contact Information",
+            "contactInfoDescription": "Enter the customer's contact details.",
+            "addressDescription": "Enter the customer's address.",
+            "street": "Street Address",
+            "street2": "Apt, suite, etc.",
+            "city": "City",
+            "state": "State/Province",
+            "postalCode": "Postal/ZIP Code",
+            "country": "Country",
+            "notes": "Additional Notes",
+            "notesDescription": "Add any additional notes about this customer."
         }
     }
 }
