@@ -33,8 +33,9 @@ export default function CustomersList() {
     const { data: customersData, isLoading, error } = useQuery({
         queryKey: ["customers", company.uuid],
         queryFn: async () => {
-            const result = await KompelloApi.customersApi.customersList();
-            // The backend already filters by company for the user
+            const result = await KompelloApi.customersApi.customersList({
+                company: company.uuid,
+            });
             return Array.isArray(result) ? result : [];
         },
     });

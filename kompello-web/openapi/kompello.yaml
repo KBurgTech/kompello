@@ -248,6 +248,20 @@ paths:
       description: List customers from companies the user is a member of.
       tags:
       - customers
+      parameters:
+      - name: company
+        in: query
+        description: Filter customers by company UUID.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: is_active
+        in: query
+        description: Filter customers by active status.
+        required: false
+        schema:
+          type: boolean
       security:
       - basicAuth: []
       - cookieAuth: []

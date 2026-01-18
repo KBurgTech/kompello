@@ -36,6 +36,11 @@ export interface CustomersDestroyRequest {
     uuid: string;
 }
 
+export interface CustomersListRequest {
+    company?: string;
+    isActive?: boolean;
+}
+
 export interface CustomersPartialUpdateRequest {
     uuid: string;
     patchedCustomer?: Omit<PatchedCustomer, 'uuid'|'created_on'|'modified_on'>;
@@ -132,8 +137,16 @@ export class CustomersApi extends runtime.BaseAPI {
     /**
      * List customers from companies the user is a member of.
      */
-    async customersListRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CustomerList>>> {
+    async customersListRaw(requestParameters: CustomersListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CustomerList>>> {
         const queryParameters: any = {};
+
+        if (requestParameters['company'] != null) {
+            queryParameters['company'] = requestParameters['company'];
+        }
+
+        if (requestParameters['isActive'] != null) {
+            queryParameters['is_active'] = requestParameters['isActive'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -153,8 +166,8 @@ export class CustomersApi extends runtime.BaseAPI {
     /**
      * List customers from companies the user is a member of.
      */
-    async customersList(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CustomerList>> {
-        const response = await this.customersListRaw(initOverrides);
+    async customersList(requestParameters: CustomersListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CustomerList>> {
+        const response = await this.customersListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

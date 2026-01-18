@@ -2,6 +2,7 @@
 ViewSets for Customer and Address management.
 """
 
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import permissions, status
 from rest_framework.decorators import permission_classes
 from rest_framework.request import Request
@@ -59,6 +60,24 @@ class CustomerViewSet(BaseModelViewSet):
             return CustomerListSerializer
         return CustomerSerializer
     
+    @extend_schema(
+        description="List customers from companies the user is a member of.",
+        parameters=[
+            OpenApiParameter(
+                name="company",
+                type=OpenApiTypes.UUID,
+                description="Filter customers by company UUID.",
+                required=False,
+            ),
+            OpenApiParameter(
+                name="is_active",
+                type=OpenApiTypes.BOOL,
+                description="Filter customers by active status.",
+                required=False,
+            ),
+        ],
+        responses=CustomerListSerializer(many=True),
+    )
     @permission_classes([permissions.IsAuthenticated])
     def list(self, request: Request, *args, **kwargs):
         """List customers from companies the user is a member of."""

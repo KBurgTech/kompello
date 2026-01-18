@@ -167,6 +167,28 @@ class CustomerApiViewsetTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
+    def test_schema_includes_list_filters(self):
+        """Schema documents company and is_active filters for customer list."""
+        response = self.client.get(
+            reverse("schema.spec"),
+            HTTP_ACCEPT="application/vnd.oai.openapi+json",
+        )
+        self.assertEqual(response.status_code, 200)
+
+        schema = response.json()
+        parameters = schema["paths"]["/api/customers/"]["get"].get("parameters", [])
+
+        company_param = next((p for p in parameters if p.get("name") == "company"), None)
+        self.assertIsNotNone(company_param)
+        self.assertEqual(company_param.get("in"), "query")
+        self.assertEqual(company_param.get("schema", {}).get("type"), "string")
+        self.assertEqual(company_param.get("schema", {}).get("format"), "uuid")
+
+        is_active_param = next((p for p in parameters if p.get("name") == "is_active"), None)
+        self.assertIsNotNone(is_active_param)
+        self.assertEqual(is_active_param.get("in"), "query")
+        self.assertEqual(is_active_param.get("schema", {}).get("type"), "boolean")
+
     def test_retrieve_customer(self):
         """Test retrieving a specific customer."""
         address_data = {
