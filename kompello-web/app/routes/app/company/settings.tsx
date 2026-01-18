@@ -5,6 +5,7 @@ import type { Company } from "~/lib/api/kompello"
 import { useTranslation } from "react-i18next"
 import CompanyBasicSettings from "~/components/company/companyBasicSettings"
 import MemberSettings from "~/components/company/companyMembersSettings"
+import CompanyCustomFieldsSettings from "~/components/company/companyCustomFieldsSettings"
 
 export default function Settings() {
     const { setTitle } = useTitle()
@@ -20,6 +21,7 @@ export default function Settings() {
             <div className="grid grid-cols-1 gap-2 md:col-span-3">
                 <CompanyBasicSettings company={context} />
                 <MemberSettings company={context} />
+                <CompanyCustomFieldsSettings company={context} />
             </div>
         </div>
     )

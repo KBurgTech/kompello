@@ -1,5 +1,6 @@
 apis/CompaniesApi.ts
 apis/CurrenciesApi.ts
+apis/CustomFieldsApi.ts
 apis/CustomersApi.ts
 apis/ItemsApi.ts
 apis/SchemaApi.ts
@@ -12,13 +13,19 @@ models/Address.ts
 models/Company.ts
 models/Csrf.ts
 models/Currency.ts
+models/CustomFieldDefinition.ts
+models/CustomFieldMetadata.ts
 models/Customer.ts
 models/CustomerList.ts
+models/DataTypeChoice.ts
+models/DataTypeEnum.ts
 models/Item.ts
 models/ItemList.ts
+models/ModelTypeChoice.ts
 models/Password.ts
 models/PatchedCompany.ts
 models/PatchedCurrency.ts
+models/PatchedCustomFieldDefinition.ts
 models/PatchedCustomer.ts
 models/PatchedItem.ts
 models/PatchedUnit.ts

@@ -79,6 +79,32 @@
             "members": {
                 "title": "Manage Members",
                 "description": "Manage the members of your company."
+            },
+            "customFields": {
+                "title": "Custom Fields",
+                "description": "Create and manage custom fields for this company.",
+                "addField": "Add custom field",
+                "editField": "Edit custom field",
+                "formDescription": "Define how the field should appear and behave in the app.",
+                "name": "Display name",
+                "nameHelper": "Shown to users when they fill in this field.",
+                "key": "Key",
+                "keyHelper": "Unique identifier without spaces; used in exports and API responses.",
+                "dataType": "Data type",
+                "dataTypePlaceholder": "Select a data type",
+                "modelType": "Target model",
+                "modelTypePlaceholder": "Select a model",
+                "trackHistory": "Track changes",
+                "trackHistoryHelper": "Keep a history of value changes for auditing.",
+                "showInUi": "Show in UI",
+                "showInUiHelper": "Display this field in forms and tables.",
+                "archive": "Archive field",
+                "archiveHelper": "Archived fields stay hidden but keep existing data.",
+                "historyBadge": "History",
+                "uiBadge": "Visible",
+                "archivedBadge": "Archived",
+                "empty": "No custom fields are defined for this company yet.",
+                "confirmDelete": "Delete this custom field? Existing values may no longer be editable."
             }
         },
         "accountSettings": {

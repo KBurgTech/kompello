@@ -79,6 +79,32 @@
             "members": {
                 "title": "Mitglieder verwalten",
                 "description": "Verwalten Sie die Mitglieder Ihres Unternehmens."
+            },
+            "customFields": {
+                "title": "Benutzerdefinierte Felder",
+                "description": "Erstellen und verwalten Sie benutzerdefinierte Felder für dieses Unternehmen.",
+                "addField": "Benutzerdefiniertes Feld hinzufügen",
+                "editField": "Benutzerdefiniertes Feld bearbeiten",
+                "formDescription": "Definieren Sie, wie das Feld in der Anwendung angezeigt und verwendet wird.",
+                "name": "Anzeigename",
+                "nameHelper": "Wird den Nutzern angezeigt, wenn sie dieses Feld ausfüllen.",
+                "key": "Schlüssel",
+                "keyHelper": "Eindeutiger Bezeichner ohne Leerzeichen; wird in Exporten und API-Antworten verwendet.",
+                "dataType": "Datentyp",
+                "dataTypePlaceholder": "Datentyp auswählen",
+                "modelType": "Zielmodell",
+                "modelTypePlaceholder": "Modell auswählen",
+                "trackHistory": "Änderungen nachverfolgen",
+                "trackHistoryHelper": "Speichert die Historie der Werteänderungen zur Nachvollziehbarkeit.",
+                "showInUi": "Im UI anzeigen",
+                "showInUiHelper": "Zeigt dieses Feld in Formularen und Tabellen an.",
+                "archive": "Feld archivieren",
+                "archiveHelper": "Archivierte Felder werden ausgeblendet, bestehende Daten bleiben erhalten.",
+                "historyBadge": "Historie",
+                "uiBadge": "Sichtbar",
+                "archivedBadge": "Archiviert",
+                "empty": "Für dieses Unternehmen sind noch keine benutzerdefinierten Felder definiert.",
+                "confirmDelete": "Dieses benutzerdefinierte Feld löschen? Vorhandene Werte sind möglicherweise nicht mehr bearbeitbar."
             }
         },
         "accountSettings": {

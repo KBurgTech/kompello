@@ -402,6 +402,169 @@ paths:
       responses:
         '405':
           description: No response body
+  /api/custom-fields/:
+    get:
+      operationId: custom_fields_list
+      tags:
+      - custom-fields
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFieldDefinition'
+          description: ''
+    post:
+      operationId: custom_fields_create
+      tags:
+      - custom-fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomFieldDefinition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomFieldDefinition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomFieldDefinition'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldDefinition'
+          description: ''
+  /api/custom-fields/{uuid}/:
+    get:
+      operationId: custom_fields_retrieve
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - custom-fields
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldDefinition'
+          description: ''
+    put:
+      operationId: custom_fields_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - custom-fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomFieldDefinition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomFieldDefinition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomFieldDefinition'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldDefinition'
+          description: ''
+    patch:
+      operationId: custom_fields_partial_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - custom-fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomFieldDefinition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomFieldDefinition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomFieldDefinition'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldDefinition'
+          description: ''
+    delete:
+      operationId: custom_fields_destroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - custom-fields
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/custom-fields/metadata/:
+    get:
+      operationId: custom_fields_metadata_retrieve
+      description: 'Get metadata for client: available model types and data types.'
+      tags:
+      - custom-fields
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldMetadata'
+          description: ''
   /api/customers/:
     get:
       operationId: customers_list
@@ -1376,6 +1539,65 @@ components:
       - short_name
       - symbol
       - uuid
+    CustomFieldDefinition:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        key:
+          type: string
+          maxLength: 256
+        name:
+          type: string
+          maxLength: 256
+        data_type:
+          $ref: '#/components/schemas/DataTypeEnum'
+        model_type:
+          type: integer
+        company:
+          type: string
+          format: uuid
+        track_history:
+          type: boolean
+        is_archived:
+          type: boolean
+        show_in_ui:
+          type: boolean
+        extra_data:
+          nullable: true
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - data_type
+      - key
+      - model_type
+      - modified_on
+      - name
+      - uuid
+    CustomFieldMetadata:
+      type: object
+      properties:
+        model_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelTypeChoice'
+        data_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataTypeChoice'
+      required:
+      - data_types
+      - model_types
     Customer:
       type: object
       description: Serializer for the Customer model with nested address.
@@ -1497,6 +1719,26 @@ components:
       - mobile_phone
       - title
       - uuid
+    DataTypeChoice:
+      type: object
+      properties:
+        value:
+          type: integer
+        label:
+          type: string
+      required:
+      - label
+      - value
+    DataTypeEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - Text
+        * `2` - Number
+        * `3` - Boolean
     Item:
       type: object
       description: Serializer for the Item model with nested currency and unit details.
@@ -1608,6 +1850,19 @@ components:
       - price_per_unit
       - unit_short_name
       - uuid
+    ModelTypeChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        app_label:
+          type: string
+        model:
+          type: string
+      required:
+      - app_label
+      - id
+      - model
     Password:
       type: object
       properties:
@@ -1664,6 +1919,42 @@ components:
           type: string
           description: Full currency name (e.g., Euro, US Dollar, British Pound)
           maxLength: 100
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCustomFieldDefinition:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        key:
+          type: string
+          maxLength: 256
+        name:
+          type: string
+          maxLength: 256
+        data_type:
+          $ref: '#/components/schemas/DataTypeEnum'
+        model_type:
+          type: integer
+        company:
+          type: string
+          format: uuid
+        track_history:
+          type: boolean
+        is_archived:
+          type: boolean
+        show_in_ui:
+          type: boolean
+        extra_data:
+          nullable: true
         created_on:
           type: string
           format: date-time
