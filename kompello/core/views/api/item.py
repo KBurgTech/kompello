@@ -2,8 +2,8 @@
 ViewSet for Item model.
 """
 
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import permissions, status
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, OpenApiExample, extend_schema, inline_serializer
+from rest_framework import permissions, status, serializers
 from rest_framework.decorators import permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -19,9 +19,12 @@ class ItemViewSet(BaseModelViewSet):
     """
     ViewSet for managing items.
     Users can only access items from companies they are members of.
+    
+    Items support custom fields that can be defined per company.
+    Custom fields are included in all responses and can be set during creation/updates.
     """
     
-    queryset = Item.objects.select_related("company", "currency", "unit").all()
+    queryset = Item.objects.select_related("company", "currency", "unit").prefetch_related("custom_fields__custom_field").all()
     serializer_class = ItemSerializer
     
     def get_queryset(self):
@@ -80,7 +83,10 @@ class ItemViewSet(BaseModelViewSet):
         return Response(serializer.data)
     
     @extend_schema(
-        description="Retrieve a specific item by UUID.",
+        description=(
+            "Retrieve a specific item by UUID. "
+            "The response includes all custom field values associated with the item."
+        ),
         responses=ItemSerializer,
     )
     @permission_classes([IsMemberOfCompany | permissions.IsAdminUser])
@@ -89,9 +95,48 @@ class ItemViewSet(BaseModelViewSet):
         return super().retrieve(request, *args, **kwargs)
     
     @extend_schema(
-        description="Create a new item.",
+        description=(
+            "Create a new item with optional custom fields. "
+            "Custom fields must be defined for the item model and company before they can be used. "
+            "The custom_fields object maps field keys to their values."
+        ),
         request=ItemSerializer,
         responses={201: ItemSerializer},
+        examples=[
+            OpenApiExample(
+                name="Item with custom fields",
+                description="Example of creating an item with custom field values",
+                value={
+                    "company": "550e8400-e29b-41d4-a716-446655440000",
+                    "name": "Web Development",
+                    "description": "Hourly rate for web development services",
+                    "currency": "660e8400-e29b-41d4-a716-446655440000",
+                    "unit": "770e8400-e29b-41d4-a716-446655440000",
+                    "price_per_unit": "75.00",
+                    "price_max": "150.00",
+                    "custom_fields": {
+                        "skill_level": "Senior",
+                        "billable_hours": 40,
+                        "requires_certification": True
+                    }
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                name="Item without custom fields",
+                description="Example of creating an item without custom fields",
+                value={
+                    "company": "550e8400-e29b-41d4-a716-446655440000",
+                    "name": "Consulting",
+                    "description": "Consulting services",
+                    "currency": "660e8400-e29b-41d4-a716-446655440000",
+                    "unit": "770e8400-e29b-41d4-a716-446655440000",
+                    "price_per_unit": "100.00",
+                    "custom_fields": {}
+                },
+                request_only=True,
+            ),
+        ]
     )
     @permission_classes([permissions.IsAuthenticated])
     def create(self, request: Request, *args, **kwargs):
@@ -125,9 +170,28 @@ class ItemViewSet(BaseModelViewSet):
         return super().create(request, *args, **kwargs)
     
     @extend_schema(
-        description="Update an existing item.",
+        description=(
+            "Update an existing item. "
+            "You can update custom fields by providing a custom_fields object. "
+            "Only the custom fields you specify will be updated; others remain unchanged."
+        ),
         request=ItemSerializer,
         responses=ItemSerializer,
+        examples=[
+            OpenApiExample(
+                name="Update with custom fields",
+                description="Example of updating an item with custom fields",
+                value={
+                    "name": "Updated Web Development",
+                    "price_per_unit": "85.00",
+                    "custom_fields": {
+                        "skill_level": "Expert",
+                        "billable_hours": 45
+                    }
+                },
+                request_only=True,
+            ),
+        ]
     )
     @permission_classes([IsMemberOfCompany | permissions.IsAdminUser])
     def update(self, request: Request, *args, **kwargs):
@@ -135,7 +199,11 @@ class ItemViewSet(BaseModelViewSet):
         return super().update(request, *args, **kwargs)
     
     @extend_schema(
-        description="Partially update an existing item.",
+        description=(
+            "Partially update an existing item. "
+            "You can update custom fields by providing a custom_fields object. "
+            "Only the custom fields you specify will be updated; others remain unchanged."
+        ),
         request=ItemSerializer,
         responses=ItemSerializer,
     )

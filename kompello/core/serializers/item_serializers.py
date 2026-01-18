@@ -3,14 +3,41 @@ Serializers for Item model.
 """
 
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 
 from kompello.core.models.billing_models import Item, Currency, Unit
 from kompello.core.models import Company
 from kompello.core.serializers.currency_serializers import CurrencySerializer
 from kompello.core.serializers.unit_serializers import UnitSerializer
+from kompello.core.serializers.custom_field_serializers import CustomFieldMixin, CustomFieldValueSerializer
 
 
-class ItemSerializer(serializers.ModelSerializer):
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            name='Item with custom fields',
+            description='Example showing an item with custom field values',
+            value={
+                'uuid': '880e8400-e29b-41d4-a716-446655440000',
+                'company': '550e8400-e29b-41d4-a716-446655440000',
+                'name': 'Web Development',
+                'description': 'Hourly web development service',
+                'currency': '660e8400-e29b-41d4-a716-446655440000',
+                'unit': '770e8400-e29b-41d4-a716-446655440000',
+                'price_per_unit': '75.00',
+                'price_max': '150.00',
+                'custom_fields': {
+                    'skill_level': 'Senior',
+                    'max_hours': 40,
+                    'requires_certification': True
+                },
+                'created_on': '2026-01-18T12:00:00Z',
+                'modified_on': '2026-01-18T12:00:00Z'
+            }
+        )
+    ]
+)
+class ItemSerializer(CustomFieldMixin, serializers.ModelSerializer):
     """Serializer for the Item model with nested currency and unit details."""
     
     company = serializers.SlugRelatedField(
@@ -33,6 +60,14 @@ class ItemSerializer(serializers.ModelSerializer):
     currency_details = CurrencySerializer(source='currency', read_only=True)
     unit_details = UnitSerializer(source='unit', read_only=True)
     
+    # Explicitly declare custom_fields to ensure it's processed
+    # Custom fields are key-value pairs where keys are CustomFieldDefinition keys
+    custom_fields = CustomFieldValueSerializer(
+        required=False,
+        allow_null=True,
+        help_text='Custom field values as key-value pairs. Keys must match CustomFieldDefinition keys for this model and company.'
+    )
+    
     class Meta:
         model = Item
         fields = [
@@ -46,6 +81,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "unit_details",
             "price_per_unit",
             "price_max",
+            "custom_fields",
             "created_on",
             "modified_on",
         ]
