@@ -1,6 +1,7 @@
 from auditlog.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.exceptions import ValidationError
 from kompello.core.models.base_models import BaseModel, HistoryModel
 from django.db import models
 
@@ -34,11 +35,25 @@ class CustomFieldDefinition(BaseModel, HistoryModel):
     # should changes to field instances be tracked in history
     track_history = models.BooleanField(default=True, null=False, blank=False)
 
+    # is_archived marks if this field definition is archived (no new instances can be created)
+    is_archived = models.BooleanField(default=False, null=False, blank=False)
+
+    # show_in_ui controls if this field should be displayed in the UI
+    show_in_ui = models.BooleanField(default=True, null=False, blank=False)
+
     # extra_data can store additional information like validation rules, options for dropdowns, etc.
     extra_data = models.JSONField(null=True, blank=True)
 
     class Meta:
         unique_together = ('key', 'model_type', 'company')  # Ensure unique custom field per model type and company
+
+    def delete(self, *args, **kwargs):
+        """Prevent deletion if instances exist to avoid data loss"""
+        if self.instances.exists():
+            raise ValidationError(
+                f"Cannot delete custom field definition '{self.key}' with existing instances. This would result in data loss."
+            )
+        return super().delete(*args, **kwargs)
 
 
 class CustomFieldInstance(BaseModel, HistoryModel):
@@ -54,6 +69,14 @@ class CustomFieldInstance(BaseModel, HistoryModel):
 
     # value stores the actual value of the custom field instance
     value = models.JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)
+
+    def save(self, *args, **kwargs):
+        # Prevent creating new instances for archived custom field definitions
+        if self.pk is None and self.custom_field_id and self.custom_field.is_archived:
+            raise ValidationError(
+                f"Cannot create instances for archived custom field: {self.custom_field.key}"
+            )
+        super().save(*args, **kwargs)
 
     class Meta:
         indexes = [

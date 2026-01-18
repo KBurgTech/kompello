@@ -9,6 +9,7 @@ from kompello.core.views.api.system import SystemApiViews
 from kompello.core.views.api.test import create_dummy_user
 from kompello.core.views.api.unit import UnitViewSet
 from kompello.core.views.api.user import UserViewSet
+from kompello.core.views.api.custom_field import CustomFieldDefinitionViewSet
 from kompello.core.views.frontend.vite_view import ViteView
 
 app_name = "core"
@@ -20,6 +21,7 @@ router.register(r"customers", CustomerViewSet, basename="customers")
 router.register(r"units", UnitViewSet, basename="units")
 router.register(r"currencies", CurrencyViewSet, basename="currencies")
 router.register(r"items", ItemViewSet, basename="items")
+router.register(r"custom-fields", CustomFieldDefinitionViewSet, basename="custom_fields")
 router.register(r"system", SystemApiViews, basename="system")
 
 urlpatterns = [
