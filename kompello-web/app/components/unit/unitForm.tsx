@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
@@ -9,6 +9,8 @@ import { useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { toast } from "sonner";
+import { ResponseError } from "~/lib/api/kompello/runtime";
 
 export const unitSchema = z.object({
     shortName: z.string().min(1, "Short name is required").max(20),
@@ -20,11 +22,11 @@ export type UnitFormSchema = z.infer<typeof unitSchema>;
 interface UnitFormProps {
     unit: Unit | null;
     companyId: string;
-    onSave?: () => void;
+    onSavingChange?: (saving: boolean) => void;
     ref?: React.ForwardedRef<{ submitForm: () => void }>;
 }
 
-export default function UnitForm({ unit, companyId, onSave, ref }: UnitFormProps) {
+export default function UnitForm({ unit, companyId, onSavingChange, ref }: UnitFormProps) {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
@@ -37,44 +39,61 @@ export default function UnitForm({ unit, companyId, onSave, ref }: UnitFormProps
         },
     });
 
-    // Expose form methods to parent component
-    useImperativeHandle(ref, () => ({
-        submitForm: () => {
-            form.handleSubmit(handleSubmit)();
-        },
-    }));
-
-    async function handleSubmit(values: UnitFormSchema) {
-        try {
+    const mutation = useMutation({
+        mutationFn: async (values: UnitFormSchema) => {
             if (unit?.uuid) {
-                // Update existing unit
                 const patchData = {
                     shortName: values.shortName,
                     longName: values.longName,
                 };
-
                 await KompelloApi.unitsApi.unitsPartialUpdate({
                     uuid: unit.uuid,
                     patchedUnit: patchData as any,
                 });
-                queryClient.invalidateQueries({ queryKey: ["units", unit.uuid] });
             } else {
-                // Create new unit
                 const createData = {
                     company: companyId,
                     shortName: values.shortName,
                     longName: values.longName,
                 };
-
                 await KompelloApi.unitsApi.unitsCreate({
                     unit: createData as any,
                 });
-                queryClient.invalidateQueries({ queryKey: ["units", companyId] });
             }
-            onSave?.();
-        } catch (error) {
-            console.error("Error saving unit:", error);
-        }
+        },
+        onMutate: async () => {
+            onSavingChange?.(true);
+        },
+        onSuccess: async () => {
+            if (unit?.uuid) {
+                await queryClient.invalidateQueries({ queryKey: ["units", unit.uuid] });
+            } else {
+                await queryClient.invalidateQueries({ queryKey: ["units", companyId] });
+            }
+            toast.success(t("actions.messages.saveSuccess"));
+        },
+        onError: async (error: unknown) => {
+            let message = t("common.error");
+            if (error && typeof error === "object" && "response" in error && (error as ResponseError).response) {
+                const data = await (error as ResponseError).response.clone().text();
+                message = data || message;
+            }
+            toast.error(t("actions.messages.saveError"), { description: message });
+        },
+        onSettled: async () => {
+            onSavingChange?.(false);
+        },
+    });
+
+    // Expose form methods to parent component
+    useImperativeHandle(ref, () => ({
+        submitForm: () => {
+            form.handleSubmit((values) => mutation.mutate(values))();
+        },
+    }));
+
+    function handleSubmit(values: UnitFormSchema) {
+        mutation.mutate(values);
     }
 
     return (

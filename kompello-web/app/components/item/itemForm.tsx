@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
@@ -13,6 +13,8 @@ import { Textarea } from "~/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import type { Currency, Unit } from "~/lib/api/kompello";
 import { CustomFieldsSection } from "~/components/customFieldsSection";
+import { toast } from "sonner";
+import { ResponseError } from "~/lib/api/kompello/runtime";
 
 export const itemSchema = z.object({
     name: z.string().min(1, "Name is required").max(255),
@@ -34,11 +36,11 @@ export type ItemFormSchema = z.infer<typeof itemSchema>;
 interface ItemFormProps {
     item: Item | null;
     companyId: string;
-    onSave?: () => void;
+    onSavingChange?: (saving: boolean) => void;
     ref?: React.ForwardedRef<{ submitForm: () => void }>;
 }
 
-export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps) {
+export default function ItemForm({ item, companyId, onSavingChange, ref }: ItemFormProps) {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -109,17 +111,9 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
         fetchData();
     }, [companyId]);
 
-    // Expose form methods to parent component
-    useImperativeHandle(ref, () => ({
-        submitForm: () => {
-            form.handleSubmit(handleSubmit)();
-        },
-    }));
-
-    async function handleSubmit(values: ItemFormSchema) {
-        try {
+    const mutation = useMutation({
+        mutationFn: async (values: ItemFormSchema) => {
             if (item?.uuid) {
-                // Update existing item
                 const patchData: Omit<PatchedItem, 'uuid'|'currency_details'|'unit_details'|'created_on'|'modified_on'> = {
                     name: values.name,
                     description: values.description || "",
@@ -127,19 +121,13 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
                     unit: values.unit,
                     pricePerUnit: values.pricePerUnit,
                     priceMax: values.priceMax || null,
+                    customFields: values.customFields || {},
                 };
-
-                // Include all custom fields (including nulls for deleted values)
-                patchData.customFields = values.customFields || {};
-
                 await KompelloApi.itemsApi.itemsPartialUpdate({
                     uuid: item.uuid,
                     patchedItem: patchData,
                 });
-                queryClient.invalidateQueries({ queryKey: ["items", item.uuid] });
-                queryClient.invalidateQueries({ queryKey: ["items"] });
             } else {
-                // Create new item
                 const createData: any = {
                     company: companyId,
                     name: values.name,
@@ -148,22 +136,47 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
                     unit: values.unit,
                     pricePerUnit: values.pricePerUnit,
                     priceMax: values.priceMax || null,
+                    customFields: values.customFields || {},
                 };
-
-                // Include all custom fields
-                createData.customFields = values.customFields || {};
-
                 await KompelloApi.itemsApi.itemsCreate({
                     item: createData,
                 });
-                queryClient.invalidateQueries({ queryKey: ["items", companyId] });
-                queryClient.invalidateQueries({ queryKey: ["items"] });
             }
-            onSave?.();
-        } catch (error) {
-            console.error("Error saving item:", error);
-            alert(`Error saving item: ${error instanceof Error ? error.message : String(error)}`);
-        }
+        },
+        onMutate: async () => {
+            onSavingChange?.(true);
+        },
+        onSuccess: async () => {
+            if (item?.uuid) {
+                await queryClient.invalidateQueries({ queryKey: ["items", item.uuid] });
+            } else {
+                await queryClient.invalidateQueries({ queryKey: ["items", companyId] });
+            }
+            await queryClient.invalidateQueries({ queryKey: ["items"] });
+            toast.success(t("actions.messages.saveSuccess"));
+        },
+        onError: async (error: unknown) => {
+            let message = t("common.error");
+            if (error && typeof error === "object" && "response" in error && (error as ResponseError).response) {
+                const data = await (error as ResponseError).response.clone().text();
+                message = data || message;
+            }
+            toast.error(t("actions.messages.saveError"), { description: message });
+        },
+        onSettled: async () => {
+            onSavingChange?.(false);
+        },
+    });
+
+    // Expose form methods to parent component
+    useImperativeHandle(ref, () => ({
+        submitForm: () => {
+            form.handleSubmit((values) => mutation.mutate(values))();
+        },
+    }));
+
+    function handleSubmit(values: ItemFormSchema) {
+        mutation.mutate(values);
     }
 
     return (

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
@@ -9,6 +9,8 @@ import { useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { toast } from "sonner";
+import { ResponseError } from "~/lib/api/kompello/runtime";
 
 export const currencySchema = z.object({
     symbol: z.string().min(1, "Symbol is required").max(5),
@@ -21,11 +23,11 @@ export type CurrencyFormSchema = z.infer<typeof currencySchema>;
 interface CurrencyFormProps {
     currency: Currency | null;
     companyId: string;
-    onSave?: () => void;
+    onSavingChange?: (saving: boolean) => void;
     ref?: React.ForwardedRef<{ submitForm: () => void }>;
 }
 
-export default function CurrencyForm({ currency, companyId, onSave, ref }: CurrencyFormProps) {
+export default function CurrencyForm({ currency, companyId, onSavingChange, ref }: CurrencyFormProps) {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
@@ -39,46 +41,63 @@ export default function CurrencyForm({ currency, companyId, onSave, ref }: Curre
         },
     });
 
-    // Expose form methods to parent component
-    useImperativeHandle(ref, () => ({
-        submitForm: () => {
-            form.handleSubmit(handleSubmit)();
-        },
-    }));
-
-    async function handleSubmit(values: CurrencyFormSchema) {
-        try {
+    const mutation = useMutation({
+        mutationFn: async (values: CurrencyFormSchema) => {
             if (currency?.uuid) {
-                // Update existing currency
                 const patchData = {
                     symbol: values.symbol,
                     shortName: values.shortName,
                     longName: values.longName,
                 };
-
                 await KompelloApi.currenciesApi.currenciesPartialUpdate({
                     uuid: currency.uuid,
                     patchedCurrency: patchData as any,
                 });
-                queryClient.invalidateQueries({ queryKey: ["currencies", currency.uuid] });
             } else {
-                // Create new currency
                 const createData = {
                     company: companyId,
                     symbol: values.symbol,
                     shortName: values.shortName,
                     longName: values.longName,
                 };
-
                 await KompelloApi.currenciesApi.currenciesCreate({
                     currency: createData as any,
                 });
-                queryClient.invalidateQueries({ queryKey: ["currencies", companyId] });
             }
-            onSave?.();
-        } catch (error) {
-            console.error("Error saving currency:", error);
-        }
+        },
+        onMutate: async () => {
+            onSavingChange?.(true);
+        },
+        onSuccess: async () => {
+            if (currency?.uuid) {
+                await queryClient.invalidateQueries({ queryKey: ["currencies", currency.uuid] });
+            } else {
+                await queryClient.invalidateQueries({ queryKey: ["currencies", companyId] });
+            }
+            toast.success(t("actions.messages.saveSuccess"));
+        },
+        onError: async (error: unknown) => {
+            let message = t("common.error");
+            if (error && typeof error === "object" && "response" in error && (error as ResponseError).response) {
+                const data = await (error as ResponseError).response.clone().text();
+                message = data || message;
+            }
+            toast.error(t("actions.messages.saveError"), { description: message });
+        },
+        onSettled: async () => {
+            onSavingChange?.(false);
+        },
+    });
+
+    // Expose form methods to parent component
+    useImperativeHandle(ref, () => ({
+        submitForm: () => {
+            form.handleSubmit((values) => mutation.mutate(values))();
+        },
+    }));
+
+    function handleSubmit(values: CurrencyFormSchema) {
+        mutation.mutate(values);
     }
 
     return (

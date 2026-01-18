@@ -4,6 +4,7 @@ import { Outlet } from "react-router";
 import { TitleProvider } from "./titleContext";
 import { ThemeProvider } from "./themeContext";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from "~/components/ui/sonner";
 /**
  * Composes and provides application-wide context providers.
  *
@@ -20,6 +21,7 @@ function Providers(): JSX.Element {
             <ThemeProvider>
                 <TitleProvider>
                     <AuthProvider>
+                        <Toaster position="top-center" richColors={true} closeButton={true}/>
                         <Outlet />
                     </AuthProvider>
                 </TitleProvider>

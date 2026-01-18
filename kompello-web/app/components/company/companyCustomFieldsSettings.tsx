@@ -10,6 +10,7 @@ import { Skeleton } from "../ui/skeleton";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "../ui/table";
 import { CustomFieldDialog, type CustomFieldFormValues } from "./customFieldDialog";
 import { CustomFieldRow } from "./customFieldRow";
+import { toast } from "sonner"
 
 type CreatePayload = Omit<CustomFieldDefinition, "uuid" | "createdOn" | "modifiedOn" | "created_on" | "modified_on">;
 type PatchPayload = Partial<CreatePayload>;
@@ -64,7 +65,11 @@ export default function CompanyCustomFieldsSettings({ company }: { company: Comp
             queryClient.invalidateQueries({ queryKey: ["custom-fields", company.uuid] });
             setDialogOpen(false);
             setEditingField(null);
+            toast.success(t("actions.messages.saveSuccess"));
         },
+        onError: (error) => {
+            toast.error(t("actions.messages.saveError") + " " + error);
+        }
     });
 
     const deleteMutation = useMutation({

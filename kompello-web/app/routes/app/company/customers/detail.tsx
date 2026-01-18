@@ -1,6 +1,6 @@
 import { useTitle } from "~/components/titleContext";
-import { useEffect, useRef } from "react";
-import { useOutletContext, useNavigate, useParams } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { useOutletContext, useParams } from "react-router";
 import type { Company } from "~/lib/api/kompello";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import CustomerForm from "~/components/customer/customerForm";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
+import { Spinner } from "~/components/ui/spinner";
 
 function formatDate(date: Date | string | undefined): string {
     if (!date) return "-";
@@ -28,8 +29,8 @@ export default function CustomerDetail() {
     const company = useOutletContext<Company>();
     const { customerId } = useParams();
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const formRef = useRef<any>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Check if this is a new customer
     const isNew = customerId === "new";
@@ -103,13 +104,14 @@ export default function CustomerDetail() {
                     )}
 
                     {/* Save Button */}
-                    <Button onClick={handleSave} size="sm">
-                        {t("actions.save")}
+                    <Button onClick={handleSave} size="sm" disabled={isSaving} aria-busy={isSaving}>
+                        {isSaving && <Spinner className="mr-2" />}
+                        {isSaving ? t("common.saving") : t("actions.save")}
                     </Button>
                 </div>
             ),
         });
-    }, [customer, isNew, setTitle, setHeaderAction, t, company.uuid, navigate]);
+    }, [customer, isNew, setTitle, setHeaderAction, t, company.uuid, isSaving]);
 
     if (!isNew && isLoading) {
         return (
@@ -138,7 +140,7 @@ export default function CustomerDetail() {
                     ref={formRef}
                     customer={customer || null} 
                     companyId={company.uuid!} 
-                    onSave={() => navigate(`/${company.uuid}/customers`)} 
+                    onSavingChange={setIsSaving}
                 />
             </div>
         </div>

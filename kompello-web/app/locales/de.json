@@ -9,7 +9,12 @@
         "login": "Anmelden",
         "open": "Öffnen",
         "back": "Zurück",
-        "select": "Auswählen"
+        "select": "Auswählen",
+        "messages": {
+            "saveError": "Speichern fehlgeschlagen.",
+            "loadError": "Daten konnten nicht geladen werden.",
+            "saveSuccess": "Speichern erfolgreich."
+        }
     },
     "common": {
         "loading": "Wird geladen...",

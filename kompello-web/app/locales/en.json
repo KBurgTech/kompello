@@ -9,7 +9,12 @@
         "login": "Login",
         "open": "Open",
         "back": "Back",
-        "select": "Select"
+        "select": "Select",
+        "messages": {
+            "saveError": "Failed to save.",
+            "loadError": "Failed to load data.",
+            "saveSuccess": "Saved successfully."
+        }
     },
     "common": {
         "loading": "Loading...",

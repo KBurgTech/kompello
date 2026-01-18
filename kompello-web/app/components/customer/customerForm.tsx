@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
@@ -7,6 +7,8 @@ import type { Customer } from "~/lib/api/kompello";
 import { KompelloApi } from "~/lib/api/kompelloApi";
 import { useImperativeHandle } from "react";
 import { PersonalInfoSection, ContactInfoSection, AddressSection, NotesSection } from "./customerFormSections";
+import { toast } from "sonner";
+import { ResponseError } from "~/lib/api/kompello/runtime";
 
 export const customerSchema = z.object({
     title: z.string().max(50).optional().nullable(),
@@ -57,12 +59,12 @@ function formatDateForInput(date: string | Date | undefined): string {
 interface CustomerFormProps {
     customer: Customer | null;
     companyId: string;
-    onSave?: () => void;
     onActiveChange?: (active: boolean) => void;
+    onSavingChange?: (saving: boolean) => void;
     ref?: React.ForwardedRef<{ submitForm: () => void; setActive: (active: boolean) => void }>;
 }
 
-export default function CustomerForm({ customer, companyId, onSave, onActiveChange, ref }: CustomerFormProps) {
+export default function CustomerForm({ customer, companyId, onActiveChange, onSavingChange, ref }: CustomerFormProps) {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
@@ -97,24 +99,10 @@ export default function CustomerForm({ customer, companyId, onSave, onActiveChan
         },
     });
 
-    // Expose form methods to parent component
-    useImperativeHandle(ref, () => ({
-        submitForm: () => {
-            form.handleSubmit(handleSubmit)();
-        },
-        setActive: (active: boolean) => {
-            form.setValue("isActive", active);
-            handleActiveChange(active);
-        },
-    }));
-
-    async function handleSubmit(values: CustomerFormSchema) {
-        try {
-            // Convert birthdate string to Date if provided
+    const mutation = useMutation({
+        mutationFn: async (values: CustomerFormSchema) => {
             const birthdate = values.birthdate ? new Date(values.birthdate) : null;
-
             if (customer?.uuid) {
-                // Update existing customer
                 const patchData: Record<string, unknown> = {
                     title: values.title || "",
                     firstname: values.firstname || "",
@@ -126,8 +114,6 @@ export default function CustomerForm({ customer, companyId, onSave, onActiveChan
                     notes: values.notes || "",
                     isActive: values.isActive,
                 };
-
-                // Add address if provided
                 if (values.address) {
                     patchData.address = {
                         street: values.address.street || "",
@@ -138,15 +124,11 @@ export default function CustomerForm({ customer, companyId, onSave, onActiveChan
                         country: values.address.country || "",
                     };
                 }
-
-                const content = {
+                await KompelloApi.customersApi.customersPartialUpdate({
                     uuid: customer.uuid,
                     patchedCustomer: patchData as any,
-                };
-                await KompelloApi.customersApi.customersPartialUpdate(content);
-                queryClient.invalidateQueries({ queryKey: ["customers", customer.uuid] });
+                });
             } else {
-                // Create new customer
                 const createData: Record<string, unknown> = {
                     company: companyId,
                     title: values.title || "",
@@ -159,8 +141,6 @@ export default function CustomerForm({ customer, companyId, onSave, onActiveChan
                     notes: values.notes || "",
                     isActive: values.isActive,
                 };
-
-                // Add address if provided
                 if (values.address) {
                     createData.address = {
                         street: values.address.street || "",
@@ -171,17 +151,48 @@ export default function CustomerForm({ customer, companyId, onSave, onActiveChan
                         country: values.address.country || "",
                     };
                 }
-
-                const content = {
+                await KompelloApi.customersApi.customersCreate({
                     customer: createData as any,
-                };
-                await KompelloApi.customersApi.customersCreate(content);
-                queryClient.invalidateQueries({ queryKey: ["customers", companyId] });
+                });
             }
-            onSave?.();
-        } catch (error) {
-            console.error("Error saving customer:", error);
-        }
+        },
+        onMutate: async () => {
+            onSavingChange?.(true);
+        },
+        onSuccess: async () => {
+            if (customer?.uuid) {
+                await queryClient.invalidateQueries({ queryKey: ["customers", customer.uuid] });
+            } else {
+                await queryClient.invalidateQueries({ queryKey: ["customers", companyId] });
+            }
+            toast.success(t("actions.messages.saveSuccess"));
+        },
+        onError: async (error: unknown) => {
+            let message = t("common.error");
+            if (error && typeof error === "object" && "response" in error && (error as ResponseError).response) {
+                const data = await (error as ResponseError).response.clone().text();
+                message = data || message;
+            }
+            toast.error(t("actions.messages.saveError"), { description: message });
+        },
+        onSettled: async () => {
+            onSavingChange?.(false);
+        },
+    });
+
+    // Expose form methods to parent component
+    useImperativeHandle(ref, () => ({
+        submitForm: () => {
+            form.handleSubmit((values) => mutation.mutate(values))();
+        },
+        setActive: (active: boolean) => {
+            form.setValue("isActive", active);
+            handleActiveChange(active);
+        },
+    }));
+
+    function handleSubmit(values: CustomerFormSchema) {
+        mutation.mutate(values);
     }
 
     // Handle active status changes

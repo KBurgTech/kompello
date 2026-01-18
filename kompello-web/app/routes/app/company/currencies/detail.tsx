@@ -1,6 +1,6 @@
 import { useTitle } from "~/components/titleContext";
-import { useEffect, useRef } from "react";
-import { useOutletContext, useNavigate, useParams } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { useOutletContext, useParams } from "react-router";
 import type { Company } from "~/lib/api/kompello";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { KompelloApi } from "~/lib/api/kompelloApi";
 import CurrencyForm from "~/components/currency/currencyForm";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import { Spinner } from "~/components/ui/spinner";
 
 function formatDate(date: Date | string | undefined): string {
     if (!date) return "-";
@@ -27,8 +28,8 @@ export default function CurrencyDetail() {
     const company = useOutletContext<Company>();
     const { currencyId } = useParams();
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const formRef = useRef<any>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Check if this is a new currency
     const isNew = currencyId === "new";
@@ -84,13 +85,14 @@ export default function CurrencyDetail() {
                     )}
 
                     {/* Save Button */}
-                    <Button onClick={handleSave} size="sm">
-                        {t("actions.save")}
+                    <Button onClick={handleSave} size="sm" disabled={isSaving} aria-busy={isSaving}>
+                        {isSaving && <Spinner className="mr-2" />}
+                        {isSaving ? t("common.saving") : t("actions.save")}
                     </Button>
                 </div>
             ),
         });
-    }, [currency, isNew, setTitle, setHeaderAction, t, company.uuid, navigate]);
+    }, [currency, isNew, setTitle, setHeaderAction, t, company.uuid, isSaving]);
 
     if (!isNew && isLoading) {
         return (
@@ -119,7 +121,7 @@ export default function CurrencyDetail() {
                     ref={formRef}
                     currency={currency || null} 
                     companyId={company.uuid!} 
-                    onSave={() => navigate(`/${company.uuid}/currencies`)} 
+                    onSavingChange={setIsSaving}
                 />
             </div>
         </div>
