@@ -2,9 +2,12 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 from kompello.core.views.api.company import CompanyViewSet
+from kompello.core.views.api.currency import CurrencyViewSet
 from kompello.core.views.api.customer import CustomerViewSet
+from kompello.core.views.api.item import ItemViewSet
 from kompello.core.views.api.system import SystemApiViews
 from kompello.core.views.api.test import create_dummy_user
+from kompello.core.views.api.unit import UnitViewSet
 from kompello.core.views.api.user import UserViewSet
 from kompello.core.views.frontend.vite_view import ViteView
 
@@ -14,6 +17,9 @@ router = routers.SimpleRouter()
 router.register(r"users", UserViewSet, basename="users")
 router.register(r"companies", CompanyViewSet, basename="companies")
 router.register(r"customers", CustomerViewSet, basename="customers")
+router.register(r"units", UnitViewSet, basename="units")
+router.register(r"currencies", CurrencyViewSet, basename="currencies")
+router.register(r"items", ItemViewSet, basename="items")
 router.register(r"system", SystemApiViews, basename="system")
 
 urlpatterns = [
