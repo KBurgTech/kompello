@@ -1,7 +1,7 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from django.contrib.contenttypes.models import ContentType
 
 from kompello.core.views.api.base import BaseModelViewSet
@@ -93,3 +93,82 @@ class CustomFieldDefinitionViewSet(BaseModelViewSet):
             {"value": v, "label": l} for v, l in CustomFieldDefinition.FieldDataType.choices
         ]
         return Response({"model_types": model_types, "data_types": data_types})
+
+    @extend_schema(
+        description="Get custom field definitions for a specific model type and company, filtered by show_in_ui flag.",
+        parameters=[
+            OpenApiParameter(
+                name="model_type_id",
+                type=OpenApiTypes.INT,
+                description="ContentType ID for the model (e.g., from metadata endpoint)",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="company_uuid",
+                type=OpenApiTypes.UUID,
+                description="Company UUID",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="show_in_ui",
+                type=OpenApiTypes.BOOL,
+                description="If true, only return fields with show_in_ui=true. Default: true",
+                required=False,
+            ),
+        ],
+        responses=CustomFieldDefinitionReadSerializer(many=True),
+    )
+    @action(detail=False, methods=["get"])
+    @permission_classes([permissions.IsAuthenticated])
+    def for_model(self, request):
+        """
+        Get custom field definitions for a specific model type and company.
+        
+        Query parameters:
+        - model_type_id: ContentType ID for the model (required)
+        - company_uuid: Company UUID (required)
+        - show_in_ui: If true, only return fields with show_in_ui=true (optional, default=true)
+        """
+        model_type_id = request.query_params.get("model_type_id")
+        company_uuid = request.query_params.get("company_uuid")
+        show_in_ui = request.query_params.get("show_in_ui", "true").lower() == "true"
+        
+        if not model_type_id or not company_uuid:
+            return Response(
+                {"detail": "model_type_id and company_uuid query parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            model_type = ContentType.objects.get(id=model_type_id)
+        except ContentType.DoesNotExist:
+            return Response(
+                {"detail": "Invalid model_type_id."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            company = Company.objects.get(uuid=company_uuid)
+        except Company.DoesNotExist:
+            return Response(
+                {"detail": "Invalid company_uuid."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check user is member of company
+        if not request.user.is_staff and not company.members.filter(id=request.user.id).exists():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        # Filter by model type, company, not archived
+        queryset = CustomFieldDefinition.objects.filter(
+            model_type=model_type,
+            company=company,
+            is_archived=False
+        )
+        
+        if show_in_ui:
+            queryset = queryset.filter(show_in_ui=True)
+        
+        queryset = queryset.order_by("name")
+        serializer = CustomFieldDefinitionReadSerializer(queryset, many=True)
+        return Response(serializer.data)

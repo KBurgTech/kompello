@@ -549,6 +549,44 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/custom-fields/for_model/:
+    get:
+      operationId: custom_fields_for_model_list
+      description: Get custom field definitions for a specific model type and company,
+        filtered by show_in_ui flag.
+      parameters:
+      - in: query
+        name: company_uuid
+        schema:
+          type: string
+          format: uuid
+        description: Company UUID
+        required: true
+      - in: query
+        name: model_type_id
+        schema:
+          type: integer
+        description: ContentType ID for the model (e.g., from metadata endpoint)
+        required: true
+      - in: query
+        name: show_in_ui
+        schema:
+          type: boolean
+        description: 'If true, only return fields with show_in_ui=true. Default: true'
+      tags:
+      - custom-fields
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFieldDefinitionRead'
+          description: ''
   /api/custom-fields/metadata/:
     get:
       operationId: custom_fields_metadata_retrieve
@@ -759,7 +797,9 @@ paths:
           description: ''
     post:
       operationId: items_create
-      description: Create a new item.
+      description: Create a new item with optional custom fields. Custom fields must
+        be defined for the item model and company before they can be used. The custom_fields
+        object maps field keys to their values.
       tags:
       - items
       requestBody:
@@ -767,6 +807,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Item'
+            examples:
+              ItemWithCustomFields:
+                value:
+                  company: 550e8400-e29b-41d4-a716-446655440000
+                  name: Web Development
+                  description: Hourly rate for web development services
+                  currency: 660e8400-e29b-41d4-a716-446655440000
+                  unit: 770e8400-e29b-41d4-a716-446655440000
+                  price_per_unit: '75.00'
+                  price_max: '150.00'
+                  custom_fields:
+                    skill_level: Senior
+                    billable_hours: 40
+                    requires_certification: true
+                summary: Item with custom fields
+                description: Example of creating an item with custom field values
+              ItemWithoutCustomFields:
+                value:
+                  company: 550e8400-e29b-41d4-a716-446655440000
+                  name: Consulting
+                  description: Consulting services
+                  currency: 660e8400-e29b-41d4-a716-446655440000
+                  unit: 770e8400-e29b-41d4-a716-446655440000
+                  price_per_unit: '100.00'
+                  custom_fields: {}
+                summary: Item without custom fields
+                description: Example of creating an item without custom fields
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Item'
@@ -787,7 +854,8 @@ paths:
   /api/items/{uuid}/:
     get:
       operationId: items_retrieve
-      description: Retrieve a specific item by UUID.
+      description: Retrieve a specific item by UUID. The response includes all custom
+        field values associated with the item.
       parameters:
       - in: path
         name: uuid
@@ -806,10 +874,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Item'
+              examples:
+                ItemWithCustomFields:
+                  value:
+                    uuid: 880e8400-e29b-41d4-a716-446655440000
+                    company: 550e8400-e29b-41d4-a716-446655440000
+                    name: Web Development
+                    description: Hourly web development service
+                    currency: 660e8400-e29b-41d4-a716-446655440000
+                    unit: 770e8400-e29b-41d4-a716-446655440000
+                    price_per_unit: '75.00'
+                    price_max: '150.00'
+                    custom_fields:
+                      skill_level: Senior
+                      max_hours: 40
+                      requires_certification: true
+                    created_on: '2026-01-18T12:00:00Z'
+                    modified_on: '2026-01-18T12:00:00Z'
+                  summary: Item with custom fields
+                  description: Example showing an item with custom field values
           description: ''
     put:
       operationId: items_update
-      description: Update an existing item.
+      description: Update an existing item. You can update custom fields by providing
+        a custom_fields object. Only the custom fields you specify will be updated;
+        others remain unchanged.
       parameters:
       - in: path
         name: uuid
@@ -824,6 +913,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Item'
+            examples:
+              UpdateWithCustomFields:
+                value:
+                  name: Updated Web Development
+                  price_per_unit: '85.00'
+                  custom_fields:
+                    skill_level: Expert
+                    billable_hours: 45
+                summary: Update with custom fields
+                description: Example of updating an item with custom fields
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Item'
@@ -843,7 +942,9 @@ paths:
           description: ''
     patch:
       operationId: items_partial_update
-      description: Partially update an existing item.
+      description: Partially update an existing item. You can update custom fields
+        by providing a custom_fields object. Only the custom fields you specify will
+        be updated; others remain unchanged.
       parameters:
       - in: path
         name: uuid
@@ -858,6 +959,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PatchedItem'
+            examples:
+              ItemWithCustomFields:
+                value:
+                  uuid: 880e8400-e29b-41d4-a716-446655440000
+                  company: 550e8400-e29b-41d4-a716-446655440000
+                  name: Web Development
+                  description: Hourly web development service
+                  currency: 660e8400-e29b-41d4-a716-446655440000
+                  unit: 770e8400-e29b-41d4-a716-446655440000
+                  price_per_unit: '75.00'
+                  price_max: '150.00'
+                  custom_fields:
+                    skill_level: Senior
+                    max_hours: 40
+                    requires_certification: true
+                  created_on: '2026-01-18T12:00:00Z'
+                  modified_on: '2026-01-18T12:00:00Z'
+                summary: Item with custom fields
+                description: Example showing an item with custom field values
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/PatchedItem'
@@ -873,6 +993,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Item'
+              examples:
+                ItemWithCustomFields:
+                  value:
+                    uuid: 880e8400-e29b-41d4-a716-446655440000
+                    company: 550e8400-e29b-41d4-a716-446655440000
+                    name: Web Development
+                    description: Hourly web development service
+                    currency: 660e8400-e29b-41d4-a716-446655440000
+                    unit: 770e8400-e29b-41d4-a716-446655440000
+                    price_per_unit: '75.00'
+                    price_max: '150.00'
+                    custom_fields:
+                      skill_level: Senior
+                      max_hours: 40
+                      requires_certification: true
+                    created_on: '2026-01-18T12:00:00Z'
+                    modified_on: '2026-01-18T12:00:00Z'
+                  summary: Item with custom fields
+                  description: Example showing an item with custom field values
           description: ''
     delete:
       operationId: items_destroy
@@ -1584,6 +1723,52 @@ components:
       - modified_on
       - name
       - uuid
+    CustomFieldDefinitionRead:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        key:
+          type: string
+          maxLength: 256
+        name:
+          type: string
+          maxLength: 256
+        data_type:
+          $ref: '#/components/schemas/DataTypeEnum'
+        model_type:
+          type: string
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        track_history:
+          type: boolean
+        is_archived:
+          type: boolean
+        show_in_ui:
+          type: boolean
+        extra_data:
+          nullable: true
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - data_type
+      - key
+      - model_type
+      - modified_on
+      - name
+      - uuid
     CustomFieldMetadata:
       type: object
       properties:
@@ -1784,6 +1969,12 @@ components:
           description: Maximum price per unit (optional). If not set, price_per_unit
             is the fixed price. Enables flexible pricing for discounts or customer-specific
             rates.
+        custom_fields:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Custom field values as key-value pairs. Keys must match CustomFieldDefinition
+            keys for this model and company.
         created_on:
           type: string
           format: date-time
@@ -2067,6 +2258,12 @@ components:
           description: Maximum price per unit (optional). If not set, price_per_unit
             is the fixed price. Enables flexible pricing for discounts or customer-specific
             rates.
+        custom_fields:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Custom field values as key-value pairs. Keys must match CustomFieldDefinition
+            keys for this model and company.
         created_on:
           type: string
           format: date-time

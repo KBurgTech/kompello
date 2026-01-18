@@ -70,7 +70,6 @@ export default function Login(): JSX.Element {
         const success = await auth.login(values.username, values.password)
         setLoginFailed(!success)
         setLoginInProgress(false)
-        console.log("Login attempt:", values.username, "Success:", success)
         if (success) {
             // Wait for the auth state to update
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -81,7 +80,6 @@ export default function Login(): JSX.Element {
     useEffect(() => {
         // If the user is already authenticated, redirect to the home page
         if (auth.user) {
-            console.log("Redirecting to:", getRedirectTo());
             navigate(getRedirectTo());
         }
     }, []);

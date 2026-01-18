@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
-import type { Item } from "~/lib/api/kompello";
+import type { Item, PatchedItem } from "~/lib/api/kompello";
 import { KompelloApi } from "~/lib/api/kompelloApi";
 import { useImperativeHandle, useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -12,6 +12,7 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import type { Currency, Unit } from "~/lib/api/kompello";
+import { CustomFieldsSection } from "~/components/customFieldsSection";
 
 export const itemSchema = z.object({
     name: z.string().min(1, "Name is required").max(255),
@@ -20,6 +21,12 @@ export const itemSchema = z.object({
     unit: z.string().min(1, "Unit is required"),
     pricePerUnit: z.string().min(1, "Price per unit is required"),
     priceMax: z.string().optional().nullable(),
+    customFields: z.record(z.union([
+        z.string(),
+        z.number(),
+        z.boolean(),
+        z.null(),
+    ])).optional(),
 });
 
 export type ItemFormSchema = z.infer<typeof itemSchema>;
@@ -36,6 +43,7 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
     const queryClient = useQueryClient();
     const [currencies, setCurrencies] = useState<Currency[]>([]);
     const [units, setUnits] = useState<Unit[]>([]);
+    const [modelTypeId, setModelTypeId] = useState<number | null>(null);
 
     const form = useForm<ItemFormSchema>({
         resolver: zodResolver(itemSchema),
@@ -47,8 +55,42 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
             unit: item?.unit || "",
             pricePerUnit: item?.pricePerUnit || "",
             priceMax: item?.priceMax || "",
+            customFields: item?.customFields ? { ...item.customFields } : {},
         },
     });
+
+    // Update form when item changes
+    useEffect(() => {
+        if (item) {
+            form.reset({
+                name: item.name || "",
+                description: item.description || "",
+                currency: item.currency || "",
+                unit: item.unit || "",
+                pricePerUnit: item.pricePerUnit || "",
+                priceMax: item.priceMax || "",
+                customFields: item.customFields ? { ...item.customFields } : {},
+            });
+        }
+    }, [item?.uuid, form]);
+
+    // Fetch metadata to get Item model type ID
+    useEffect(() => {
+        const fetchMetadata = async () => {
+            try {
+                const metadata = await KompelloApi.customFieldsApi.customFieldsMetadataRetrieve();
+                const itemModelType = metadata.modelTypes?.find(
+                    (mt) => mt.model === "item"
+                );
+                if (itemModelType) {
+                    setModelTypeId(itemModelType.id);
+                }
+            } catch (error) {
+                console.error("Error fetching metadata:", error);
+            }
+        };
+        fetchMetadata();
+    }, []);
 
     // Fetch currencies and units for dropdowns
     useEffect(() => {
@@ -78,7 +120,7 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
         try {
             if (item?.uuid) {
                 // Update existing item
-                const patchData = {
+                const patchData: Omit<PatchedItem, 'uuid'|'currency_details'|'unit_details'|'created_on'|'modified_on'> = {
                     name: values.name,
                     description: values.description || "",
                     currency: values.currency,
@@ -87,14 +129,18 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
                     priceMax: values.priceMax || null,
                 };
 
+                // Include all custom fields (including nulls for deleted values)
+                patchData.customFields = values.customFields || {};
+
                 await KompelloApi.itemsApi.itemsPartialUpdate({
                     uuid: item.uuid,
-                    patchedItem: patchData as any,
+                    patchedItem: patchData,
                 });
                 queryClient.invalidateQueries({ queryKey: ["items", item.uuid] });
+                queryClient.invalidateQueries({ queryKey: ["items"] });
             } else {
                 // Create new item
-                const createData = {
+                const createData: any = {
                     company: companyId,
                     name: values.name,
                     description: values.description || "",
@@ -104,14 +150,19 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
                     priceMax: values.priceMax || null,
                 };
 
+                // Include all custom fields
+                createData.customFields = values.customFields || {};
+
                 await KompelloApi.itemsApi.itemsCreate({
-                    item: createData as any,
+                    item: createData,
                 });
                 queryClient.invalidateQueries({ queryKey: ["items", companyId] });
+                queryClient.invalidateQueries({ queryKey: ["items"] });
             }
             onSave?.();
         } catch (error) {
             console.error("Error saving item:", error);
+            alert(`Error saving item: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -240,7 +291,16 @@ export default function ItemForm({ item, companyId, onSave, ref }: ItemFormProps
                         </div>
                     </CardContent>
                 </Card>
+
+                {modelTypeId && (
+                    <CustomFieldsSection
+                        modelTypeId={modelTypeId}
+                        companyId={companyId}
+                        form={form}
+                    />
+                )}
             </form>
         </Form>
     );
 }
+

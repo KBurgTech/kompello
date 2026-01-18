@@ -95,6 +95,12 @@ export interface Item {
      */
     priceMax?: string | null;
     /**
+     * Custom field values as key-value pairs. Keys must match CustomFieldDefinition keys for this model and company.
+     * @type {{ [key: string]: any; }}
+     * @memberof Item
+     */
+    customFields?: { [key: string]: any; } | null;
+    /**
      * 
      * @type {Date}
      * @memberof Item
@@ -145,6 +151,7 @@ export function ItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): Item
         'unitDetails': UnitFromJSON(json['unit_details']),
         'pricePerUnit': json['price_per_unit'],
         'priceMax': json['price_max'] == null ? undefined : json['price_max'],
+        'customFields': json['custom_fields'] == null ? undefined : json['custom_fields'],
         'createdOn': (new Date(json['created_on'])),
         'modifiedOn': (new Date(json['modified_on'])),
     };
@@ -168,6 +175,7 @@ export function ItemToJSONTyped(value?: Omit<Item, 'uuid'|'currency_details'|'un
         'unit': value['unit'],
         'price_per_unit': value['pricePerUnit'],
         'price_max': value['priceMax'],
+        'custom_fields': value['customFields'],
     };
 }
 

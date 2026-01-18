@@ -60,7 +60,7 @@ export interface ItemsUpdateRequest {
 export class ItemsApi extends runtime.BaseAPI {
 
     /**
-     * Create a new item.
+     * Create a new item with optional custom fields. Custom fields must be defined for the item model and company before they can be used. The custom_fields object maps field keys to their values.
      */
     async itemsCreateRaw(requestParameters: ItemsCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Item>> {
         if (requestParameters['item'] == null) {
@@ -91,7 +91,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new item.
+     * Create a new item with optional custom fields. Custom fields must be defined for the item model and company before they can be used. The custom_fields object maps field keys to their values.
      */
     async itemsCreate(requestParameters: ItemsCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Item> {
         const response = await this.itemsCreateRaw(requestParameters, initOverrides);
@@ -167,7 +167,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Partially update an existing item.
+     * Partially update an existing item. You can update custom fields by providing a custom_fields object. Only the custom fields you specify will be updated; others remain unchanged.
      */
     async itemsPartialUpdateRaw(requestParameters: ItemsPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Item>> {
         if (requestParameters['uuid'] == null) {
@@ -198,7 +198,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Partially update an existing item.
+     * Partially update an existing item. You can update custom fields by providing a custom_fields object. Only the custom fields you specify will be updated; others remain unchanged.
      */
     async itemsPartialUpdate(requestParameters: ItemsPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Item> {
         const response = await this.itemsPartialUpdateRaw(requestParameters, initOverrides);
@@ -206,7 +206,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve a specific item by UUID.
+     * Retrieve a specific item by UUID. The response includes all custom field values associated with the item.
      */
     async itemsRetrieveRaw(requestParameters: ItemsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Item>> {
         if (requestParameters['uuid'] == null) {
@@ -234,7 +234,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve a specific item by UUID.
+     * Retrieve a specific item by UUID. The response includes all custom field values associated with the item.
      */
     async itemsRetrieve(requestParameters: ItemsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Item> {
         const response = await this.itemsRetrieveRaw(requestParameters, initOverrides);
@@ -242,7 +242,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing item.
+     * Update an existing item. You can update custom fields by providing a custom_fields object. Only the custom fields you specify will be updated; others remain unchanged.
      */
     async itemsUpdateRaw(requestParameters: ItemsUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Item>> {
         if (requestParameters['uuid'] == null) {
@@ -280,7 +280,7 @@ export class ItemsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing item.
+     * Update an existing item. You can update custom fields by providing a custom_fields object. Only the custom fields you specify will be updated; others remain unchanged.
      */
     async itemsUpdate(requestParameters: ItemsUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Item> {
         const response = await this.itemsUpdateRaw(requestParameters, initOverrides);

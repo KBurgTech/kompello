@@ -68,7 +68,6 @@ export function AuthProvider({ children }) {
         queryKey: ["currentuser"],
         queryFn: async () => {
             try {
-                console.log("Checking current user session...");
                 await KompelloApi.currentSessionApi.allauthClientV1AuthSessionGet({ client: "browser" });
                 const user = await KompelloApi.userApi.usersMe();
                 return user;

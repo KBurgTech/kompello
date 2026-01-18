@@ -5,6 +5,7 @@ export * from './Company';
 export * from './Csrf';
 export * from './Currency';
 export * from './CustomFieldDefinition';
+export * from './CustomFieldDefinitionRead';
 export * from './CustomFieldMetadata';
 export * from './Customer';
 export * from './CustomerList';

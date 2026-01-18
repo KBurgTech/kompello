@@ -16,12 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   CustomFieldDefinition,
+  CustomFieldDefinitionRead,
   CustomFieldMetadata,
   PatchedCustomFieldDefinition,
 } from '../models/index';
 import {
     CustomFieldDefinitionFromJSON,
     CustomFieldDefinitionToJSON,
+    CustomFieldDefinitionReadFromJSON,
+    CustomFieldDefinitionReadToJSON,
     CustomFieldMetadataFromJSON,
     CustomFieldMetadataToJSON,
     PatchedCustomFieldDefinitionFromJSON,
@@ -34,6 +37,12 @@ export interface CustomFieldsCreateRequest {
 
 export interface CustomFieldsDestroyRequest {
     uuid: string;
+}
+
+export interface CustomFieldsForModelListRequest {
+    companyUuid: string;
+    modelTypeId: number;
+    showInUi?: boolean;
 }
 
 export interface CustomFieldsPartialUpdateRequest {
@@ -123,6 +132,61 @@ export class CustomFieldsApi extends runtime.BaseAPI {
      */
     async customFieldsDestroy(requestParameters: CustomFieldsDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.customFieldsDestroyRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get custom field definitions for a specific model type and company, filtered by show_in_ui flag.
+     */
+    async customFieldsForModelListRaw(requestParameters: CustomFieldsForModelListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CustomFieldDefinitionRead>>> {
+        if (requestParameters['companyUuid'] == null) {
+            throw new runtime.RequiredError(
+                'companyUuid',
+                'Required parameter "companyUuid" was null or undefined when calling customFieldsForModelList().'
+            );
+        }
+
+        if (requestParameters['modelTypeId'] == null) {
+            throw new runtime.RequiredError(
+                'modelTypeId',
+                'Required parameter "modelTypeId" was null or undefined when calling customFieldsForModelList().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['companyUuid'] != null) {
+            queryParameters['company_uuid'] = requestParameters['companyUuid'];
+        }
+
+        if (requestParameters['modelTypeId'] != null) {
+            queryParameters['model_type_id'] = requestParameters['modelTypeId'];
+        }
+
+        if (requestParameters['showInUi'] != null) {
+            queryParameters['show_in_ui'] = requestParameters['showInUi'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/custom-fields/for_model/`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CustomFieldDefinitionReadFromJSON));
+    }
+
+    /**
+     * Get custom field definitions for a specific model type and company, filtered by show_in_ui flag.
+     */
+    async customFieldsForModelList(requestParameters: CustomFieldsForModelListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CustomFieldDefinitionRead>> {
+        const response = await this.customFieldsForModelListRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

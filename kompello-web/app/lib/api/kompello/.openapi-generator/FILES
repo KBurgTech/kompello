@@ -14,6 +14,7 @@ models/Company.ts
 models/Csrf.ts
 models/Currency.ts
 models/CustomFieldDefinition.ts
+models/CustomFieldDefinitionRead.ts
 models/CustomFieldMetadata.ts
 models/Customer.ts
 models/CustomerList.ts

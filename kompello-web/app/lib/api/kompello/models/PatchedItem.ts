@@ -95,6 +95,12 @@ export interface PatchedItem {
      */
     priceMax?: string | null;
     /**
+     * Custom field values as key-value pairs. Keys must match CustomFieldDefinition keys for this model and company.
+     * @type {{ [key: string]: any; }}
+     * @memberof PatchedItem
+     */
+    customFields?: { [key: string]: any; } | null;
+    /**
      * 
      * @type {Date}
      * @memberof PatchedItem
@@ -135,6 +141,7 @@ export function PatchedItemFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'unitDetails': json['unit_details'] == null ? undefined : UnitFromJSON(json['unit_details']),
         'pricePerUnit': json['price_per_unit'] == null ? undefined : json['price_per_unit'],
         'priceMax': json['price_max'] == null ? undefined : json['price_max'],
+        'customFields': json['custom_fields'] == null ? undefined : json['custom_fields'],
         'createdOn': json['created_on'] == null ? undefined : (new Date(json['created_on'])),
         'modifiedOn': json['modified_on'] == null ? undefined : (new Date(json['modified_on'])),
     };
@@ -158,6 +165,7 @@ export function PatchedItemToJSONTyped(value?: Omit<PatchedItem, 'uuid'|'currenc
         'unit': value['unit'],
         'price_per_unit': value['pricePerUnit'],
         'price_max': value['priceMax'],
+        'custom_fields': value['customFields'],
     };
 }
 
