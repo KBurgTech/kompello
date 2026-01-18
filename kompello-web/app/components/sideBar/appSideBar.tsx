@@ -2,9 +2,12 @@ import * as React from "react"
 import {
     BriefcaseBusiness,
     ChevronRight,
+    Coins,
     Command,
     LayoutDashboard,
+    Package,
     Replace,
+    Ruler,
     Settings,
     Users,
     type LucideIcon,
@@ -55,6 +58,24 @@ const menuItems = (baseUrl: string): MenuItem[] => [
                 title: "views.sideBar.customers",
                 icon: Users,
                 href: `/${baseUrl}/customers`,
+            },
+            {
+                type: "single",
+                title: "views.sideBar.items",
+                icon: Package,
+                href: `/${baseUrl}/items`,
+            },
+            {
+                type: "single",
+                title: "views.sideBar.currencies",
+                icon: Coins,
+                href: `/${baseUrl}/currencies`,
+            },
+            {
+                type: "single",
+                title: "views.sideBar.units",
+                icon: Ruler,
+                href: `/${baseUrl}/units`,
             },
         ]
     },

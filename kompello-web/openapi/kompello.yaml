@@ -242,26 +242,184 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/currencies/:
+    get:
+      operationId: currencies_list
+      description: List currencies from companies the user is a member of.
+      parameters:
+      - in: query
+        name: company
+        schema:
+          type: string
+          format: uuid
+        description: Filter currencies by company UUID.
+      tags:
+      - currencies
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
+          description: ''
+    post:
+      operationId: currencies_create
+      description: Create a new currency.
+      tags:
+      - currencies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Currency'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Currency'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+          description: ''
+  /api/currencies/{uuid}/:
+    get:
+      operationId: currencies_retrieve
+      description: Retrieve a specific currency by UUID.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - currencies
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+          description: ''
+    put:
+      operationId: currencies_update
+      description: Update an existing currency.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - currencies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Currency'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Currency'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+          description: ''
+    patch:
+      operationId: currencies_partial_update
+      description: Partially update an existing currency.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - currencies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCurrency'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCurrency'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCurrency'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+          description: ''
+    delete:
+      operationId: currencies_destroy
+      description: Delete a currency (disabled).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - currencies
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '405':
+          description: No response body
   /api/customers/:
     get:
       operationId: customers_list
       description: List customers from companies the user is a member of.
-      tags:
-      - customers
       parameters:
-      - name: company
-        in: query
-        description: Filter customers by company UUID.
-        required: false
+      - in: query
+        name: company
         schema:
           type: string
           format: uuid
-      - name: is_active
-        in: query
-        description: Filter customers by active status.
-        required: false
+        description: Filter customers by company UUID.
+      - in: query
+        name: is_active
         schema:
           type: boolean
+        description: Filter customers by active status.
+      tags:
+      - customers
       security:
       - basicAuth: []
       - cookieAuth: []
@@ -410,6 +568,166 @@ paths:
       - cookieAuth: []
       responses:
         '204':
+          description: No response body
+  /api/items/:
+    get:
+      operationId: items_list
+      description: List items from companies the user is a member of.
+      parameters:
+      - in: query
+        name: company
+        schema:
+          type: string
+          format: uuid
+        description: Filter items by company UUID.
+      tags:
+      - items
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemList'
+          description: ''
+    post:
+      operationId: items_create
+      description: Create a new item.
+      tags:
+      - items
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Item'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Item'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+          description: ''
+  /api/items/{uuid}/:
+    get:
+      operationId: items_retrieve
+      description: Retrieve a specific item by UUID.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - items
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+          description: ''
+    put:
+      operationId: items_update
+      description: Update an existing item.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - items
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Item'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Item'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+          description: ''
+    patch:
+      operationId: items_partial_update
+      description: Partially update an existing item.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - items
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedItem'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+          description: ''
+    delete:
+      operationId: items_destroy
+      description: Delete an item (disabled).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - items
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '405':
           description: No response body
   /api/schema/:
     get:
@@ -574,6 +892,166 @@ paths:
               schema:
                 $ref: '#/components/schemas/Csrf'
           description: ''
+  /api/units/:
+    get:
+      operationId: units_list
+      description: List units from companies the user is a member of.
+      parameters:
+      - in: query
+        name: company
+        schema:
+          type: string
+          format: uuid
+        description: Filter units by company UUID.
+      tags:
+      - units
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Unit'
+          description: ''
+    post:
+      operationId: units_create
+      description: Create a new unit.
+      tags:
+      - units
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Unit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Unit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Unit'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+  /api/units/{uuid}/:
+    get:
+      operationId: units_retrieve
+      description: Retrieve a specific unit by UUID.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - units
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    put:
+      operationId: units_update
+      description: Update an existing unit.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - units
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Unit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Unit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Unit'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    patch:
+      operationId: units_partial_update
+      description: Partially update an existing unit.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - units
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUnit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUnit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUnit'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    delete:
+      operationId: units_destroy
+      description: Delete a unit (disabled).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - units
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '405':
+          description: No response body
   /api/users/:
     get:
       operationId: users_list
@@ -859,6 +1337,45 @@ components:
           type: string
       required:
       - csrfToken
+    Currency:
+      type: object
+      description: Serializer for the Currency model.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        symbol:
+          type: string
+          description: Currency symbol (e.g., €, $, £)
+          maxLength: 10
+        short_name:
+          type: string
+          description: Currency code (e.g., EUR, USD, GBP)
+          maxLength: 10
+        long_name:
+          type: string
+          description: Full currency name (e.g., Euro, US Dollar, British Pound)
+          maxLength: 100
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - long_name
+      - modified_on
+      - short_name
+      - symbol
+      - uuid
     Customer:
       type: object
       description: Serializer for the Customer model with nested address.
@@ -980,6 +1497,117 @@ components:
       - mobile_phone
       - title
       - uuid
+    Item:
+      type: object
+      description: Serializer for the Item model with nested currency and unit details.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Item name
+          maxLength: 255
+        description:
+          type: string
+          description: Optional item description
+        currency:
+          type: string
+          format: uuid
+        currency_details:
+          allOf:
+          - $ref: '#/components/schemas/Currency'
+          readOnly: true
+        unit:
+          type: string
+          format: uuid
+        unit_details:
+          allOf:
+          - $ref: '#/components/schemas/Unit'
+          readOnly: true
+        price_per_unit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Base/minimum price per unit
+        price_max:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+          description: Maximum price per unit (optional). If not set, price_per_unit
+            is the fixed price. Enables flexible pricing for discounts or customer-specific
+            rates.
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - currency
+      - currency_details
+      - modified_on
+      - name
+      - price_per_unit
+      - unit
+      - unit_details
+      - uuid
+    ItemList:
+      type: object
+      description: Lightweight serializer for listing items.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: integer
+          readOnly: true
+          description: Company that owns this item
+        name:
+          type: string
+          description: Item name
+          maxLength: 255
+        price_per_unit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Base/minimum price per unit
+        price_max:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+          description: Maximum price per unit (optional). If not set, price_per_unit
+            is the fixed price. Enables flexible pricing for discounts or customer-specific
+            rates.
+        currency_symbol:
+          type: string
+          readOnly: true
+        unit_short_name:
+          type: string
+          readOnly: true
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - currency_symbol
+      - name
+      - price_per_unit
+      - unit_short_name
+      - uuid
     Password:
       type: object
       properties:
@@ -1005,6 +1633,37 @@ components:
           format: uri
           readOnly: true
           nullable: true
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCurrency:
+      type: object
+      description: Serializer for the Currency model.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        symbol:
+          type: string
+          description: Currency symbol (e.g., €, $, £)
+          maxLength: 10
+        short_name:
+          type: string
+          description: Currency code (e.g., EUR, USD, GBP)
+          maxLength: 10
+        long_name:
+          type: string
+          description: Full currency name (e.g., Euro, US Dollar, British Pound)
+          maxLength: 100
         created_on:
           type: string
           format: date-time
@@ -1072,6 +1731,86 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedItem:
+      type: object
+      description: Serializer for the Item model with nested currency and unit details.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Item name
+          maxLength: 255
+        description:
+          type: string
+          description: Optional item description
+        currency:
+          type: string
+          format: uuid
+        currency_details:
+          allOf:
+          - $ref: '#/components/schemas/Currency'
+          readOnly: true
+        unit:
+          type: string
+          format: uuid
+        unit_details:
+          allOf:
+          - $ref: '#/components/schemas/Unit'
+          readOnly: true
+        price_per_unit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Base/minimum price per unit
+        price_max:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+          description: Maximum price per unit (optional). If not set, price_per_unit
+            is the fixed price. Enables flexible pricing for discounts or customer-specific
+            rates.
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUnit:
+      type: object
+      description: Serializer for the Unit model.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        short_name:
+          type: string
+          description: Short name for the unit (e.g., h, kg, pcs)
+          maxLength: 20
+        long_name:
+          type: string
+          description: Long name for the unit (e.g., hours, kilograms, pieces)
+          maxLength: 100
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedUser:
       type: object
       properties:
@@ -1110,6 +1849,40 @@ components:
           items:
             type: string
             format: uuid
+    Unit:
+      type: object
+      description: Serializer for the Unit model.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        company:
+          type: string
+          format: uuid
+        short_name:
+          type: string
+          description: Short name for the unit (e.g., h, kg, pcs)
+          maxLength: 20
+        long_name:
+          type: string
+          description: Long name for the unit (e.g., hours, kilograms, pieces)
+          maxLength: 100
+        created_on:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_on:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_on
+      - long_name
+      - modified_on
+      - short_name
+      - uuid
     User:
       type: object
       properties:

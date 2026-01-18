@@ -51,6 +51,9 @@
         "sideBar": {
             "dashboard": "Dashboard",
             "customers": "Kunden",
+            "items": "Artikel",
+            "currencies": "Währungen",
+            "units": "Einheiten",
             "resources": "Ressourcen",
             "settings": {
                 "title": "Einstellungen",
@@ -132,6 +135,41 @@
             "country": "Land",
             "notes": "Zusätzliche Notizen",
             "notesDescription": "Fügen Sie zusätzliche Notizen zu diesem Kunden hinzu."
+        },
+        "currencies": {
+            "title": "Währungen",
+            "description": "Verwalten Sie die Währungen für Ihre Rechnungen und Artikel.",
+            "addCurrency": "Währung hinzufügen",
+            "symbol": "Symbol",
+            "shortName": "Code",
+            "longName": "Name",
+            "details": "Währungsdetails",
+            "detailsDescription": "Geben Sie die Währungsinformationen ein."
+        },
+        "units": {
+            "title": "Einheiten",
+            "description": "Verwalten Sie die Maßeinheiten für Ihre Artikel.",
+            "addUnit": "Einheit hinzufügen",
+            "shortName": "Abkürzung",
+            "longName": "Vollständiger Name",
+            "details": "Einheitendetails",
+            "detailsDescription": "Geben Sie die Einheiteninformationen ein."
+        },
+        "items": {
+            "title": "Artikel",
+            "description": "Verwalten Sie die Artikel und Dienstleistungen, die Sie anbieten.",
+            "addItem": "Artikel hinzufügen",
+            "name": "Artikelname",
+            "namePlaceholder": "Artikelname eingeben",
+            "descriptionPlaceholder": "Artikelbeschreibung eingeben",
+            "pricePerUnit": "Preis pro Einheit",
+            "priceMax": "Maximalpreis",
+            "currency": "Währung",
+            "unit": "Einheit",
+            "selectCurrency": "Währung auswählen",
+            "selectUnit": "Einheit auswählen",
+            "details": "Artikeldetails",
+            "detailsDescription": "Geben Sie die Artikelinformationen ein."
         }
     }
 }

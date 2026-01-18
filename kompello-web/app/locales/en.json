@@ -51,6 +51,9 @@
         "sideBar": {
             "dashboard": "Dashboard",
             "customers": "Customers",
+            "items": "Items",
+            "currencies": "Currencies",
+            "units": "Units",
             "resources": "Resources",
             "settings": {
                 "title": "Settings",
@@ -132,6 +135,41 @@
             "country": "Country",
             "notes": "Additional Notes",
             "notesDescription": "Add any additional notes about this customer."
+        },
+        "currencies": {
+            "title": "Currencies",
+            "description": "Manage the currencies used in your invoices and items.",
+            "addCurrency": "Add Currency",
+            "symbol": "Symbol",
+            "shortName": "Code",
+            "longName": "Name",
+            "details": "Currency Details",
+            "detailsDescription": "Enter the currency information."
+        },
+        "units": {
+            "title": "Units",
+            "description": "Manage the units of measurement for your items.",
+            "addUnit": "Add Unit",
+            "shortName": "Abbreviation",
+            "longName": "Full Name",
+            "details": "Unit Details",
+            "detailsDescription": "Enter the unit information."
+        },
+        "items": {
+            "title": "Items",
+            "description": "Manage the items and services you offer.",
+            "addItem": "Add Item",
+            "name": "Item Name",
+            "namePlaceholder": "Enter item name",
+            "descriptionPlaceholder": "Enter item description",
+            "pricePerUnit": "Price per Unit",
+            "priceMax": "Max Price",
+            "currency": "Currency",
+            "unit": "Unit",
+            "selectCurrency": "Select a currency",
+            "selectUnit": "Select a unit",
+            "details": "Item Details",
+            "detailsDescription": "Enter the item information."
         }
     }
 }
